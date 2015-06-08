@@ -62,7 +62,6 @@ def main(argv):
 		print "Interfaces:"
 		for port in portInventory:
 			print port.name
-		
 		dev.close()
 	else:	
 		sys.stdout.write("x")
