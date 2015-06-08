@@ -41,6 +41,7 @@ def main(argv):
 	# Regex for routable IP addresses (1.0.0.0-223.255.255.255)
 	inetRegex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
 	hostAddress = sys.argv[1]
+	
 	# Open device, retrieve Serial Number and Model
 	if inetRegex.match(str(hostAddress)):
 		sys.stdout.write('.')
@@ -55,10 +56,9 @@ def main(argv):
 		portInventory = EthPortTable(dev)
 		portInventory.get()
 		count = 0
-		while count < len(portInventory):
-			print "Interface: " + portInventory.keys()[count] + " Information"
-			print portInventory[count].items()
-			count += 1		
+		# Dump interfaces
+		for port in portInventory:
+			print "Interface: " + port.name
 		
 		dev.close()
 	else:	
