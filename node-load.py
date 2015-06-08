@@ -51,14 +51,17 @@ def main(argv):
 		else:
 			dev = Device(host=hostAddress.rstrip('\n'),user=username)
 		dev.open()	
-		print deviceInventory
 		deviceInventory.append({"IP Address":str(hostAddress).rstrip('\n'),"Serial Number":dev.facts['serialnumber'],"Model":dev.facts['model']})
+		print "\nIP Address    ", deviceInventory[0]['IP Address'] 
+		print "Serial Number ", deviceInventory[0]['Serial Number']
+		print "Model         ", deviceInventory[0]['Model']
 		portInventory = EthPortTable(dev)
 		portInventory.get()
 		count = 0
 		# Dump interfaces
+		print "Interfaces:"
 		for port in portInventory:
-			print "Interface: " + port.name
+			print port.name
 		
 		dev.close()
 	else:	
