@@ -2,7 +2,7 @@
 
 * ~~open up connection to switch~~
 * ~~query interfaces~~
-* import them into sqlite db
+* ~~import them into sqlite db~~
 * functions to add and delete all elements (Locations, Nodes, Ports, Sub-Interfaces, Services, Customers, Users) - ensure deletion of parent removes all child entities
 * build lattice service types as either "Point-to-Point" or "Multipoint" (easy icon for recognition)
 * ultimately, first phase will be simple VLAN connectivity between one or more interfaces, but trunked VLANs on customer interfaces **will** be supported
