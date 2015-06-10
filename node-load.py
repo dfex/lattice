@@ -24,6 +24,14 @@ from pprint import pprint
 ##def closeNodeDB():
 	##
 
+##def writePortstoDB():
+	##
+	
+##def readPortsFromNode():
+	##
+
+##def readNodeInformation():
+	##
 
 def main(argv):
 	sys.stdout.write("node-load\n\n")
