@@ -25,31 +25,6 @@ def populateDB(dbconnection):
 	cur.execute('CREATE TABLE ServiceMappingTable (FOREIGN KEY(ServiceID) REFERENCES ServiceTable(ServiceID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID))')
 	cur.execute('CREATE TABLE TransactionLog (TransactionID INTEGER PRIMARY KEY ASC, TransactionTimeStamp TEXT, FOREIGN KEY(UserID) REFERENCES UserTable(UserID), IPAddress TEXT, EventType TEXT, FOREIGN KEY(PortID) REFERENCES PortTable(PortID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID), EventDescription TEXT)')
 
-
-##def openNode():
-	## 
-
-##def closeNode():
-	##
-	
-##def retrievePorts():
-	##
-	
-##def openNodeDB():
-	##
-
-##def closeNodeDB():
-	##
-
-##def writePortstoDB():
-	##
-	
-##def readPortsFromNode():
-	##
-
-##def readNodeInformation():
-	##
-
 def main(argv):
 	sys.stdout.write("node-load\n\n")
 	if len(sys.argv) != 2:
