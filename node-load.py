@@ -35,6 +35,16 @@ def populateDB(dbconnection):
 	cur.execute("CREATE TABLE TransactionLog (TransactionID INTEGER PRIMARY KEY ASC, TransactionTimeStamp TEXT, UserID TEXT, IPAddress TEXT, EventType TEXT, PortID TEXT, SubInterfaceID TEXT, EventDescription TEXT);")
 	return cur
 
+def getDevInventory(dev):
+	deviceInventory = []
+	deviceInventory.append({"IP Address":str(hostAddress).rstrip('\n'),"Serial Number":dev.facts['serialnumber'],"Model":dev.facts['model']})
+	return deviceInventory
+
+def getPortInventory(dev):
+	portInventory = EthPortTable(dev)
+	portInventory.get()
+	
+
 
 def main(argv):
 	sys.stdout.write("node-load\n\n")
@@ -43,7 +53,6 @@ def main(argv):
 		sys.stdout.write("Usage: node-load <node IP address>\n")
 		sys.exit()
 	
-	deviceInventory = []
 	dbcon = None
 	
 	# Open connection to db
@@ -69,19 +78,25 @@ def main(argv):
 			else:
 				dev = Device(host=hostAddress.rstrip('\n'),user=username)
 			dev.open()	
-			deviceInventory.append({"IP Address":str(hostAddress).rstrip('\n'),"Serial Number":dev.facts['serialnumber'],"Model":dev.facts['model']})
+
+			deviceInventory = getDevInventory(dev)
+			
+			#storeDeviceInventory - write to node table
+			
 			print "\nIP Address    ", deviceInventory[0]['IP Address'] 
 			print "Serial Number ", deviceInventory[0]['Serial Number']
 			print "Model         ", deviceInventory[0]['Model']
-			portInventory = EthPortTable(dev)
-			portInventory.get()
-			count = 0
-			# Dump interfaces
+
+			portInventory = getPortInventory(dev)
+			
+			#storePortInventory - write to port table
+			
 			print "Interfaces:"
 			for port in portInventory:
 				print port.name
 				cur.execute("INSERT INTO PortTable(PortName) VALUES(?)",(port.name,))
 			dbcon.commit()
+
 			dev.close()
 		else:	
 			sys.stdout.write("x")
