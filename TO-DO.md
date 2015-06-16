@@ -3,7 +3,7 @@
 * ~~open up connection to switch~~
 * ~~query interfaces~~
 * ~~import them into sqlite db~~
-* Fix foreign key constraints
+* ~~Fix foreign key constraints~~
 * Re-factor node-load and break out re-useable functions
 * Update db schema with all elements required for "Service" creation and deletion
 * Add device programmability for Service creation
