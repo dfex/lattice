@@ -15,6 +15,7 @@
 * Build lattice service types as either "Point-to-Point" or "Multipoint" (easy icon for recognition)
 * Add functionality to add and delete all system elements (Locations, Nodes, Ports, Sub-Interfaces, Services, Customers, Users) - ensure deletion of parent removes all child entities
 * Add RESTful API hooks for all functions
+* Add multi-threading for device import
 
 * Phase 2: 
 * Update device interactions such that they could operate in a multi-vendor environment (using Node type field to distinguish)
