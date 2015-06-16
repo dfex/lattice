@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-## node-load - import device interfaces into sqlite db
+## node-load - import node interfaces into sqlite db
 
 import re, sys, getopt
 import sqlite3
@@ -10,7 +10,7 @@ from getpass import getpass
 from pprint import pprint
 
 
-def populateDB(dbconnection):
+def initialiseDB(dbconnection):
 	cur = dbconnection.cursor()
 	cur.execute("PRAGMA foreign_keys")
 	cur.execute("DROP TABLE IF EXISTS CustomerTable;")
@@ -35,81 +35,81 @@ def populateDB(dbconnection):
 	cur.execute("CREATE TABLE TransactionLog (TransactionID INTEGER PRIMARY KEY ASC, TransactionTimeStamp TEXT, UserID TEXT, IPAddress TEXT, EventType TEXT, PortID TEXT, SubInterfaceID TEXT, EventDescription TEXT);")
 	return cur
 
-def getDevInventory(dev):
-	deviceInventory = []
-	deviceInventory.append({"IP Address":str(hostAddress).rstrip('\n'),"Serial Number":dev.facts['serialnumber'],"Model":dev.facts['model']})
-	return deviceInventory
+def getNodeInventory(node):
+	# Need to fix this so that it aligns with nodeTable better
+	nodeInventory = []
+	nodeInventory.append({"Serial Number":node.facts['serialnumber'],"Model":node.facts['model']})
+	return nodeInventory
 
-def getPortInventory(dev):
-	portInventory = EthPortTable(dev)
+def getPortInventory(node):
+	portInventory = EthPortTable(node)
 	portInventory.get()
+	return portInventory
 	
+def openDB():
+	try:
+		dbconnection = sqlite3.connect('lattice.db')
+		return dbconnection
+	except sqlite3.Error, e:
+		print "Error %s:" % e.args[0]
+		sys.exit(1)	
 
+def closeDB(dbconnection):
+	dbconnection.close()
 
+def openNode(hostAddress, username, password):
+	if password != '':
+		node = Device(host=hostAddress.rstrip('\n'),user=username,passwd=password)
+	else:
+		node = Device(host=hostAddress.rstrip('\n'),user=username)
+	node.open()
+	return node
+	
+def closeNode(node):
+	node.close()
+	
 def main(argv):
 	sys.stdout.write("node-load\n\n")
+	
+	# Handle parameter
+	inetRegex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
 	if len(sys.argv) != 2:
 		sys.stdout.write("Error: Missing parameter\n")
 		sys.stdout.write("Usage: node-load <node IP address>\n")
 		sys.exit()
-	
-	dbcon = None
-	
-	# Open connection to db
-	try:
-		dbcon = sqlite3.connect('lattice.db')
-    
-		cur = populateDB(dbcon)
+	elif not(inetRegex.match(sys.argv[1])):
+		sys.stdout.write("Error: Invalid IP Address\n")
+		sys.stdout.write("Usage: node-load <node IP address>\n")
+		sys.exit()
+				
+	# Open connection to db		    
+	dbcon = openDB()
+	cur = initialiseDB(dbcon)
 		
-		# Regex for routable IP addresses (1.0.0.0-223.255.255.255)
-		inetRegex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
-		hostAddress = sys.argv[1]
-		username = raw_input('Username: ')
-		password = getpass('Password (leave blank to use SSH Key): ')
-		sys.stdout.write(". - success\n")
-		sys.stdout.write("x - error\n")
+	username = raw_input('Username: ')
+	password = getpass('Password (leave blank to use SSH Key): ')
 
-		# Open device, retrieve Serial Number and Model
-		if inetRegex.match(str(hostAddress)):
-			sys.stdout.write('.')
-			sys.stdout.flush()
-			if password != '':
-				dev = Device(host=hostAddress.rstrip('\n'),user=username,passwd=password)
-			else:
-				dev = Device(host=hostAddress.rstrip('\n'),user=username)
-			dev.open()	
+	# Open device, retrieve Serial Number and Model
+	node = openNode(sys.argv[1], username, password)
+	nodeInventory = getNodeInventory(node)
+		
+	# storeDeviceInventory - write to node table
+		
+	print "Serial Number ", nodeInventory[0]['Serial Number']
+	print "Model         ", nodeInventory[0]['Model']
 
-			deviceInventory = getDevInventory(dev)
+	portInventory = getPortInventory(node)
 			
-			#storeDeviceInventory - write to node table
-			
-			print "\nIP Address    ", deviceInventory[0]['IP Address'] 
-			print "Serial Number ", deviceInventory[0]['Serial Number']
-			print "Model         ", deviceInventory[0]['Model']
+	#storePortInventory - write to port table
+		
+	print "Interfaces:"
+	for port in portInventory:
+		print port.name
+		cur.execute("INSERT INTO PortTable(PortName) VALUES(?)",(port.name,))
+	dbcon.commit()
 
-			portInventory = getPortInventory(dev)
-			
-			#storePortInventory - write to port table
-			
-			print "Interfaces:"
-			for port in portInventory:
-				print port.name
-				cur.execute("INSERT INTO PortTable(PortName) VALUES(?)",(port.name,))
-			dbcon.commit()
-
-			dev.close()
-		else:	
-			sys.stdout.write("x")
-			sys.stdout.flush()
-			deviceInventory.append({"IP Address":str(hostAddress).rstrip('\n'),"Serial Number":"IP Address Error","Model":"N/A"})
-
-	except sqlite3.Error, e:
-		print "Error %s:" % e.args[0]
-		sys.exit(1)	
-	
-	finally:
-		if dbcon:
-			dbcon.close()
+	closeNode(node)
+	closeDB(dbcon)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
