@@ -5,6 +5,7 @@
 * ~~import them into sqlite db~~
 * ~~Fix foreign key constraints~~
 * ~~Re-factor node-load and break out re-useable functions~~
+* Spin up local instance of vSRX to run tests against
 * Import all relevant device information into db schema required for "Service" creation and deletion (eg: populate nodeTable, portTable etc)
 * Add multiple device import (break this out into new program)
 * Add device programmability for Service creation
