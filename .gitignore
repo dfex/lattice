@@ -1,3 +1,4 @@
 # exclude images for now
 /images/*
 *.db
+*.sqlite

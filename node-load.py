@@ -48,7 +48,7 @@ def getPortInventory(node):
 	
 def openDB():
 	try:
-		dbconnection = sqlite3.connect('lattice.db')
+		dbconnection = sqlite3.connect('lattice.sqlite')
 		return dbconnection
 	except sqlite3.Error, e:
 		print "Error %s:" % e.args[0]
