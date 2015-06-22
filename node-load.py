@@ -25,7 +25,7 @@ def initialiseDB(dbconnection):
 	cur.execute("DROP TABLE IF EXISTS TransactionLog;")
 	cur.execute("CREATE TABLE CustomerTable (CustomerID INTEGER PRIMARY KEY ASC, CustomerName TEXT, BillingEmailAddress TEXT, CustomerStatus TEXT);")
 	cur.execute("CREATE TABLE UserTable (UserID INTEGER PRIMARY KEY ASC, UserName TEXT, UserPassword TEXT, UserStatus TEXT);")
-	cur.execute("CREATE TABLE LocationTable (LocationID INTEGER PRIMARY KEY ASC, LocationName TEXT NOT NULL, RackID TEXT, RackUnit INTEGER, FacilityName TEXT NOT NULL, FacilityFloor TEXT, FacilityAddress TEXT NOT NULL, FacilityState TEXT NOT NULL, Facility Country TEXT NOT NULL, LocationStatus TEXT NOT NULL);")
+	cur.execute("CREATE TABLE LocationTable (LocationID INTEGER PRIMARY KEY ASC, LocationName TEXT NOT NULL, RackID TEXT, RackUnit INTEGER, FacilityName TEXT NOT NULL, FacilityFloor TEXT, FacilityAddress TEXT NOT NULL, FacilityState TEXT NOT NULL, FacilityCountry TEXT NOT NULL, LocationStatus TEXT NOT NULL);")
 	cur.execute("CREATE TABLE NodeTable (NodeID INTEGER PRIMARY KEY ASC, NodeName TEXT NOT NULL, NodeType TEXT NOT NULL, NodeIPAddress TEXT NOT NULL, LocationID INTEGER NOT NULL, NodeStatus TEXT NOT NULL, FOREIGN KEY(LocationID) REFERENCES LocationTable(LocationID));")
 	cur.execute("CREATE TABLE PortTable (PortID INTEGER PRIMARY KEY ASC, PortName TEXT NOT NULL, PortStatus TEXT, PortSpeed INTEGER, CustomerID TEXT, NodeID INTEGER, FOREIGN KEY(NodeID) REFERENCES NodeTable(NodeID));")
 	cur.execute("CREATE TABLE ServiceTable (ServiceID INTEGER PRIMARY KEY ASC, ServiceName TEXT NOT NULL, ServiceType TEXT NOT NULL, ServiceRouteTarget TEXT, ServiceRouteDistinguisher TEXT);")
@@ -97,10 +97,12 @@ def main(argv):
 		
 	print "Serial Number ", nodeInventory[0]['Serial Number']
 	print "Model         ", nodeInventory[0]['Model']
-
+	
+	cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress) VALUES(?, ?, ?)",(node.hostname, nodeInventory[0]['Model'], sys.argv[1]))
+	
+	#storePortInventory - retrieve port information and write to port table
+	
 	portInventory = getPortInventory(node)
-			
-	#storePortInventory - write to port table
 		
 	print "Interfaces:"
 	for port in portInventory:
