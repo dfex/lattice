@@ -100,7 +100,8 @@ def main(argv):
 	
 	cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress) VALUES(?, ?, ?)",(node.hostname, nodeInventory[0]['Model'], sys.argv[1]))
 	
-	#storePortInventory - retrieve port information and write to port table
+	# storePortInventory - retrieve port information and write to port table
+	# need to enforce this being atomic - eg: re-sync with the network should not result in duplicates 
 	
 	portInventory = getPortInventory(node)
 		
