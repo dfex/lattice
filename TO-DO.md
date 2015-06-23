@@ -5,8 +5,8 @@
 * ~~import them into sqlite db~~
 * ~~Fix foreign key constraints~~
 * ~~Re-factor node-load and break out re-useable functions~~
-* Spin local instance(s) of vSRX to run tests against and launch with VBoxManage if required
-* Dump out EthPortTable and Device.facts() and line up against DB tables for import
+* ~~spin local instance(s) of vSRX to run tests against and launch with VBoxManage if required~~
+* Remove EthPortTable and Facts and revert to XML RPC calls - remove dependency on PyEZ field definitions
 * Test multi-field row insertion (currently committed)
 * Import all relevant device information into db schema required for "Service" creation and deletion (eg: populate nodeTable, portTable etc)
 * Add multiple device import (break this out into new program)
@@ -18,7 +18,7 @@
 * Build lattice service types as either "Point-to-Point" or "Multipoint" (easy icon for recognition)
 * Add functionality to add and delete all system elements (Locations, Nodes, Ports, Sub-Interfaces, Services, Customers, Users) - ensure deletion of parent removes all child entities
 * Add RESTful API hooks for functions
-* Add multi-threading for device import
+* Add multi-threading for device import where it makes sense
 
 * Phase 2: 
 * Update device interactions such that they could operate in a multi-vendor environment (using Node type field to distinguish)
@@ -29,3 +29,4 @@
 
 **References:
 * http://zetcode.com/db/sqlitepythontutorial/
+* http://blog.tylerc.me/code/2015/05/04/beyond-junos-eznc-pyez/
