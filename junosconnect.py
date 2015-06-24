@@ -43,7 +43,12 @@ class Junos(object):
         for old_entry in old_table:
 			if old_entry.tag != 'physical-interface':
 				continue
-			entry = dict(name=old_entry.findtext('name').strip(), admin_status=old_entry.findtext('admin-status').strip(), oper_status=old_entry.findtext('oper-status').strip(), description=old_entry.findtext('description').strip(), mtu=old_entry.findtext('mtu').strip(),speed=old_entry.findtext('speed').strip())
+			entry = dict(name=old_entry.findtext('name').strip(),
+			             admin_status=old_entry.findtext('admin-status').strip(),
+			             oper_status=old_entry.findtext('oper-status').strip(),
+			             description=old_entry.findtext('description').strip(),
+			             mtu=old_entry.findtext('mtu').strip(),
+			             speed=old_entry.findtext('speed').strip())
 			table.append(entry)
         return table
 
