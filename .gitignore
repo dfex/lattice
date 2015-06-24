@@ -1,4 +1,5 @@
 # exclude images for now
+/notes/*
 /images/*
 *.db
 *.sqlite

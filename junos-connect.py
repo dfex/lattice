@@ -31,6 +31,28 @@ class Junos(object):
             table.append(entry)
         return table
 
+    @property
+    def port_table(self):
+        """A list of Ethernet Ports
+
+        :returns: Ethernet Ports
+        :rtype: list
+        """
+        table = []
+        old_table = self.connection.rpc.get_interface_information(interface-name="[xgf]e*")
+        for old_entry in old_table:
+			if old_entry.tag != 'physical-interface':
+                continue
+            entry = dict(name=old_entry.findtext('name').strip(),
+                         admin-status=old_entry.findtext('admin-status').strip(),
+                         oper-status=old_entry.findtext('oper-status').strip(),
+                         description=old_entry.findtext('description').strip(),
+                         mtu=old_entry.findtext('mtu').strip(),
+                         speed=old_entry.findtext('speed').strip())
+            table.append(entry)
+        return table
+
+
     def __init__(self, *args, **kwargs):
         self.hostname = args[0] if len(args) else kwargs.get('host')
         self.user = kwargs.get('user', getenv('USER'))

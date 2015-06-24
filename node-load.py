@@ -4,6 +4,7 @@
 
 import re, sys, getopt
 import sqlite3
+import junosconnect
 from jnpr.junos import Device
 from jnpr.junos.op.ethport import EthPortTable
 from getpass import getpass
