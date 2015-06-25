@@ -32,3 +32,4 @@
 * http://zetcode.com/db/sqlitepythontutorial/
 * http://blog.tylerc.me/code/2015/05/04/beyond-junos-eznc-pyez/
 * http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/
+* https://github.com/vshaumann/My-Data-Science-Resources
