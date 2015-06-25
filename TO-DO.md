@@ -8,7 +8,7 @@
 * ~~spin local instance(s) of vSRX to run tests against and launch with VBoxManage if required~~
 * ~~Build Class for XML RPC calls~~
 * Fix junosconnect class property fields to allow for ObjectType "None" to be returned, but strip() to still be used when values exist - eg: Interface Description
-* Fix junosconnect inventory retrieval code
+* Fix junosconnect inventory retrieval code (device hostname and serial number need to be merged from two XML RPC calls)
 * ~~Remove EthPortTable and Facts and revert to XML RPC calls - removes dependency on PyEZ field definitions~~
 * ~~Test multi-field row insertion (currently committed)~~
 * Import all relevant device information into db schema required for "Service" creation and deletion (eg: populate nodeTable, portTable etc)
