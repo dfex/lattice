@@ -39,12 +39,12 @@ def initialiseDB(dbconnection):
 def getNodeInventory(node):
 	# Need to fix this so that it aligns with nodeTable better
 	nodeInventory = []
-	nodeInventory.append({"Serial Number":node.facts['serialnumber'],"Model":node.facts['model']})
+	nodeInventory.append({"Serial Number":node.chassisInventory[0]['serialnumber'],"Model":node.chassisInventory[0]['model']})
 	return nodeInventory
 
 def getPortInventory(node):
-	portInventory = EthPortTable(node)
-	portInventory.get()
+	portInventory=[]
+	portInventory=node.port_table
 	return portInventory
 	
 def openDB():
@@ -60,10 +60,10 @@ def closeDB(dbconnection):
 
 def openNode(hostAddress, username, password):
 	if password != '':
-		node = Device(host=hostAddress.rstrip('\n'),user=username,passwd=password)
+		node = junosconnect.Junos(hostAddress.rstrip('\n'),user=username,password=password)
 	else:
-		node = Device(host=hostAddress.rstrip('\n'),user=username)
-	node.open()
+		node = junosconnect.Junos(hostAddress.rstrip('\n'),user=username)
+	node._connect()
 	return node
 	
 def closeNode(node):
@@ -88,32 +88,31 @@ def main(argv):
 	cur = initialiseDB(dbcon)
 		
 	username = raw_input('Username: ')
-	password = getpass('Password (leave blank to use SSH Key): ')
+	passwd = getpass('Password (leave blank to use SSH Key): ')
 
 	# Open device, retrieve Serial Number and Model
-	node = openNode(sys.argv[1], username, password)
-	nodeInventory = getNodeInventory(node)
+	with junosconnect.Junos(sys.argv[1], user=username, password=passwd) as node:
+		nodeInventory = getNodeInventory(node)
 		
 	# storeDeviceInventory - write to node table
 		
-	print "Serial Number ", nodeInventory[0]['Serial Number']
-	print "Model         ", nodeInventory[0]['Model']
+		print "Serial Number ", nodeInventory[0]['Serial Number']
+		print "Model         ", nodeInventory[0]['Model']
 	
-	cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress) VALUES(?, ?, ?)",(node.hostname, nodeInventory[0]['Model'], sys.argv[1]))
+		cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress) VALUES(?, ?, ?)",(node.hostname, nodeInventory[0]['Model'], sys.argv[1]))
 	
 	# storePortInventory - retrieve port information and write to port table
 	# need to enforce this being atomic - eg: re-sync with the network should not result in duplicates 
 	
-	portInventory = getPortInventory(node)
+		portInventory = getPortInventory(node)
 		
-	print "Interfaces:"
-	for port in portInventory:
-		print port.name
-		cur.execute("INSERT INTO PortTable(PortName) VALUES(?)",(port.name,))
-	dbcon.commit()
-
-	closeNode(node)
-	closeDB(dbcon)
-
+		print "Interfaces:"
+		for port in portInventory:
+			print port['name']
+			cur.execute("INSERT INTO PortTable(PortName) VALUES(?)",(port['name'],))
+		dbcon.commit()
+	
+		closeDB(dbcon)
+	
 if __name__ == "__main__":
    main(sys.argv[1:])
