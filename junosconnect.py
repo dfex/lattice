@@ -67,20 +67,15 @@ class Junos(object):
         :returns: Chassis Inventory
         :rtype: list
         """
+        sys_info_table = self.connection.rpc.get_software_information()
+        host_name = sys_info_table.findtext('host-name')
         table = []
         version_entry = {}
-# spaghetti - we just want the hostname
-#       version_info_table = self.connection.rpc.get_software_information()
-#       for version_entry_info in version_info_table:
-#        	if version_entry_info.tag != 'software-information':
-#        		continue
-#			version_entry = dict(hostname=version_entry_info.findtext('host-name'))
-
         old_table = self.connection.rpc.get_chassis_inventory()
         for old_entry in old_table:
 			entry = dict(serialnumber=old_entry.findtext('serial-number').strip(),
-			             model=old_entry.findtext('description').strip())
-#			             hostname=version_entry['hostname'])
+			             model=old_entry.findtext('description').strip(),
+			             hostname=host_name)
 			table.append(entry)
         return table
 
