@@ -54,7 +54,7 @@ class Junos(object):
 			entry = dict(name=old_entry.findtext('name').strip(),
 			             admin_status=old_entry.findtext('admin-status').strip(),
 			             oper_status=old_entry.findtext('oper-status').strip(),
-			             description=old_entry.findtext('description'),
+			             description='None' if old_entry.findtext('description')==None else old_entry.findtext('description').strip(),
 			             mtu=old_entry.findtext('mtu').strip(),
 			             speed=old_entry.findtext('speed').strip())
 			table.append(entry)
@@ -78,8 +78,8 @@ class Junos(object):
 
         old_table = self.connection.rpc.get_chassis_inventory()
         for old_entry in old_table:
-			entry = dict(serialnumber=old_entry.findtext('serial-number'),
-			             model=old_entry.findtext('description'))
+			entry = dict(serialnumber=old_entry.findtext('serial-number').strip(),
+			             model=old_entry.findtext('description').strip())
 #			             hostname=version_entry['hostname'])
 			table.append(entry)
         return table
