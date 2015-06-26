@@ -23,6 +23,9 @@
 * Add RESTful API hooks for functions
 * Add multi-threading for device import where it makes sense
 
+##TOFIX:
+* Will need to adjust chassisInventory for multi-device/multiRE clusters or VCs
+
 * Phase 2: 
 * Update device interactions such that they could operate in a multi-vendor environment (using Node type field to distinguish)
 * Test-driven Web app in Django or lighter weight - selenium integration
