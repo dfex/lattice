@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-## node-load - import node interfaces into sqlite db
+## lattice - network topology in sql
 
 import re, sys, getopt
 import sqlite3
@@ -8,9 +8,47 @@ import junosconnect
 from getpass import getpass
 from pprint import pprint
 
-	
+def opendb():
+	try:
+		dbconnection = sqlite3.connect('lattice.sqlite')
+		return dbconnection
+	except sqlite3.Error, e:
+		print "Error %s:" % e.args[0]
+		sys.exit(1)	
+
+def closeDB(dbconnection):
+	dbconnection.close()
+
+def reinitdb():
+	dbconnection = opendb()
+	cur = dbconnection.cursor()
+	cur.execute("PRAGMA foreign_keys")
+	cur.execute("DROP TABLE IF EXISTS CustomerTable;")
+	cur.execute("DROP TABLE IF EXISTS UserTable;")
+	cur.execute("DROP TABLE IF EXISTS LocationTable;")
+	cur.execute("DROP TABLE IF EXISTS NodeTable;")
+	cur.execute("DROP TABLE IF EXISTS PortTable;")
+	cur.execute("DROP TABLE IF EXISTS ServiceTable;")
+	cur.execute("DROP TABLE IF EXISTS SubInterfaceTable;")
+	cur.execute("DROP TABLE IF EXISTS AuthorisationTable;")
+	cur.execute("DROP TABLE IF EXISTS ServiceMappingTable;")
+	cur.execute("DROP TABLE IF EXISTS TransactionLog;")
+	# switch this across to a dict/array-based description of the db and load it in. 
+	cur.execute("CREATE TABLE CustomerTable (CustomerID INTEGER PRIMARY KEY ASC, CustomerName TEXT, BillingEmailAddress TEXT, CustomerStatus TEXT);")
+	cur.execute("CREATE TABLE UserTable (UserID INTEGER PRIMARY KEY ASC, UserName TEXT, UserPassword TEXT, UserStatus TEXT);")
+	cur.execute("CREATE TABLE LocationTable (LocationID INTEGER PRIMARY KEY ASC, LocationName TEXT NOT NULL, RackID TEXT, RackUnit INTEGER, FacilityName TEXT NOT NULL, FacilityFloor TEXT, FacilityAddress TEXT NOT NULL, FacilityState TEXT NOT NULL, FacilityCountry TEXT NOT NULL, LocationStatus TEXT NOT NULL);")
+	cur.execute("CREATE TABLE NodeTable (NodeID INTEGER PRIMARY KEY ASC, NodeName TEXT NOT NULL, NodeType TEXT NOT NULL, NodeIPAddress TEXT NOT NULL, LocationID INTEGER, NodeStatus TEXT, FOREIGN KEY(LocationID) REFERENCES LocationTable(LocationID));")
+	cur.execute("CREATE TABLE PortTable (PortID INTEGER PRIMARY KEY ASC, PortName TEXT NOT NULL, PortStatus TEXT, PortSpeed INTEGER, CustomerID TEXT, NodeID INTEGER, FOREIGN KEY(NodeID) REFERENCES NodeTable(NodeID));")
+	cur.execute("CREATE TABLE ServiceTable (ServiceID INTEGER PRIMARY KEY ASC, ServiceName TEXT NOT NULL, ServiceType TEXT NOT NULL, ServiceRouteTarget TEXT, ServiceRouteDistinguisher TEXT);")
+	cur.execute("CREATE TABLE SubInterfaceTable (SubInterfaceID INTEGER PRIMARY KEY ASC, SubInterfaceUnit INTEGER, SubInterfaceVLANID INTEGER, ServiceID INTEGER, SubInterfaceStatus TEXT NOT NULL, PortID INTEGER, FOREIGN KEY(ServiceID) REFERENCES ServiceTable(ServiceID), FOREIGN KEY (PortID) REFERENCES PortTable(PortID));")
+	cur.execute("CREATE TABLE AuthorisationTable (CustomerID INTEGER, UserName TEXT, AuthorisationRole TEXT, PortID INTEGER, SubInterfaceID INTEGER, FOREIGN KEY(CustomerID) REFERENCES CustomerTable(CustomerID), FOREIGN KEY(UserName) REFERENCES UserTable(UserName), FOREIGN KEY(PortID) REFERENCES PortTable(PortID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
+	cur.execute("CREATE TABLE ServiceMappingTable (ServiceID TEXT, SubInterfaceID TEXT, FOREIGN KEY(ServiceID) REFERENCES ServiceTable(ServiceID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
+	cur.execute("CREATE TABLE TransactionLog (TransactionID INTEGER PRIMARY KEY ASC, TransactionTimeStamp TEXT, UserID TEXT, IPAddress TEXT, EventType TEXT, PortID TEXT, SubInterfaceID TEXT, EventDescription TEXT);")
+	closedb(dbconnection)
+
+
 def main(argv):
-	sys.stdout.write("node-load\n\n")
+	sys.stdout.write("lattice\n\n")
 	
 	# Handle parameter
 	# reinit
