@@ -11,7 +11,9 @@
 * ~~Fix junosconnect inventory retrieval code (device hostname and serial number need to be merged from two XML RPC calls)~~
 * ~~Remove EthPortTable and Facts and revert to XML RPC calls - removes dependency on PyEZ field definitions~~
 * ~~Test multi-field row insertion (currently committed)~~
+
 * Re-factor/build - each run is an atomic operation to populate db - add device & read ports, create service, bind ports to a service
+
 * Import all relevant device information into db schema required for "Service" creation and deletion (eg: populate nodeTable, portTable etc)
 * Define SQL commands for **unique** entries (Serial Number of Device, attached ports etc.)
 * Add a nuke database parameter (to remove duplicate crap)
