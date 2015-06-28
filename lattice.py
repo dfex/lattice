@@ -53,6 +53,8 @@ def reinitdb():
 def main(argv):
 	sys.stdout.write("lattice\n\n")
 	
+	#case (sys.argv[1]):
+	#	"reinit":
 	# Handle parameter
 	# reinit
 	# - prompt (are you sure?)
