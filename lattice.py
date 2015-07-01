@@ -21,7 +21,7 @@ def closeDB(dbconnection):
 
 def reinitdb():
 	confirmation = raw_input("Re-initialise lattice db - are you sure? (y/n)")
-	if confirm.upper = 'Y':
+	if confirmation.upper == 'Y':
 		dbconnection = opendb()
 		cur = dbconnection.cursor()
 		cur.execute("PRAGMA foreign_keys")
@@ -52,23 +52,43 @@ def reinitdb():
 
 def main(argv):
 	sys.stdout.write("lattice\n\n")
+	if len(sys.argv) <= 1:
+		sys.stdout.write("Error: Missing parameter\n")
+		sys.stdout.write("Usage: lattice reinit\n")
+		sys.stdout.write("Usage: lattice node add <ip address>\n")
+		sys.stdout.write("Usage: lattice node delete <ip address>\n")
+		sys.stdout.write("Usage: lattice node list\n")
+		sys.stdout.write("Usage: lattice service create <service-name> <service type>\n")
+		sys.stdout.write("Usage: lattice service delete <id>\n")
+		sys.stdout.write("Usage: lattice service attach <service-name> <port> <ID>\n")
+		sys.stdout.write("Usage: lattice service detach <service-name> <port> <ID>\n")
+		sys.stdout.write("Usage: lattice service list\n")
+		sys.stdout.write("Usage: lattice subinterface create <node> <port> <ID>\n")
+		sys.stdout.write("Usage: lattice subinterface delete <node> <port> <ID>\n")
+		sys.stdout.write("Usage: lattice subinterface list\n")
+		sys.exit()
+	else:
+		latticeFunction = sys.argv[1]
 	
-	#case (sys.argv[1]):
-	#	"reinit":
-	# Handle parameter
-	# reinit
-	# - prompt (are you sure?)
-	# - re-initialise the lattice database
+    #case (sys.argv[1]):
+    #	"reinit":
+    # Handle parameter
+    # reinit
+    # - prompt (are you sure?)
+    # - re-initialise the lattice database
 	# - privileged exec only!
 	# node add 192.168.100.100 
 	# - prompt for user/pass and add node to db
-	# - import ports and add to db (decide on delimeter for uplinks vs revenue ports.. pic 0 only?)
-	# node delete 192.168.100.100
+    # - import ports and add to db (decide on delimeter for uplinks vs revenue ports.. pic 0 only?)
+    # node delete 192.168.100.100
     # - check dependencies (attached sub-interfaces) - fail with list of attached sub-interfaces in hierarchical manner
     # - remove sub-interfaces from services (and delete services?) in db
     # - push config to the switch to do the same
     # - remote ports from node
 	# - remove node from db
+	# node list
+	# - output list of nodes
+	# - privileged exec only!
 	# service create <vlan> <name> <ID>
 	# service create <vxlan> <name> <ID>..
 	# service create <l2vpn> <name> <ID>..
