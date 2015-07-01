@@ -50,26 +50,34 @@ def reinitdb():
 	else:
 		return 0	
 
+def usage():
+    sys.stdout.write("Error: Missing parameter\n\n")
+    sys.stdout.write("Usage: lattice reinit\n")
+    sys.stdout.write("Usage: lattice node add <ip address>\n")
+    sys.stdout.write("Usage: lattice node delete <ip address>\n")
+    sys.stdout.write("Usage: lattice node list\n")
+    sys.stdout.write("Usage: lattice service create <service-name> <service type>\n")
+    sys.stdout.write("Usage: lattice service delete <id>\n")
+    sys.stdout.write("Usage: lattice service attach <service-name> <port> <ID>\n")
+    sys.stdout.write("Usage: lattice service detach <service-name> <port> <ID>\n")
+    sys.stdout.write("Usage: lattice service list\n")
+    sys.stdout.write("Usage: lattice subinterface create <node> <port> <ID>\n")
+    sys.stdout.write("Usage: lattice subinterface delete <node> <port> <ID>\n")
+    sys.stdout.write("Usage: lattice subinterface list\n")
+    sys.stdout.write("\n")
+
 def main(argv):
-	sys.stdout.write("lattice\n\n")
-	if len(sys.argv) <= 1:
-		sys.stdout.write("Error: Missing parameter\n")
-		sys.stdout.write("Usage: lattice reinit\n")
-		sys.stdout.write("Usage: lattice node add <ip address>\n")
-		sys.stdout.write("Usage: lattice node delete <ip address>\n")
-		sys.stdout.write("Usage: lattice node list\n")
-		sys.stdout.write("Usage: lattice service create <service-name> <service type>\n")
-		sys.stdout.write("Usage: lattice service delete <id>\n")
-		sys.stdout.write("Usage: lattice service attach <service-name> <port> <ID>\n")
-		sys.stdout.write("Usage: lattice service detach <service-name> <port> <ID>\n")
-		sys.stdout.write("Usage: lattice service list\n")
-		sys.stdout.write("Usage: lattice subinterface create <node> <port> <ID>\n")
-		sys.stdout.write("Usage: lattice subinterface delete <node> <port> <ID>\n")
-		sys.stdout.write("Usage: lattice subinterface list\n")
-		sys.exit()
-	else:
-		latticeFunction = sys.argv[1]
-	
+    sys.stdout.write("lattice\n\n")
+    latticeFunction=''
+    if len(sys.argv) <= 1:
+        usage()
+        exit(1)
+    else:
+        latticeFunction = sys.argv[1]
+    if latticeFunction == 'reinit':
+        reinitdb()
+    else:
+        usage()
     #case (sys.argv[1]):
     #	"reinit":
     # Handle parameter
