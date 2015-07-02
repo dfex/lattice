@@ -55,15 +55,43 @@ def usage():
     sys.stdout.write("Usage: lattice node add <ip address>\n")
     sys.stdout.write("Usage: lattice node delete <ip address>\n")
     sys.stdout.write("Usage: lattice node list\n")
+    sys.stdout.write("Usage: lattice subinterface create <node> <port> <ID>\n")
+    sys.stdout.write("Usage: lattice subinterface delete <node> <port> <ID>\n")
+    sys.stdout.write("Usage: lattice subinterface list\n")
     sys.stdout.write("Usage: lattice service create <service-name> <service type>\n")
     sys.stdout.write("Usage: lattice service delete <id>\n")
     sys.stdout.write("Usage: lattice service attach <service-name> <port> <ID>\n")
     sys.stdout.write("Usage: lattice service detach <service-name> <port> <ID>\n")
     sys.stdout.write("Usage: lattice service list\n")
-    sys.stdout.write("Usage: lattice subinterface create <node> <port> <ID>\n")
-    sys.stdout.write("Usage: lattice subinterface delete <node> <port> <ID>\n")
-    sys.stdout.write("Usage: lattice subinterface list\n")
     sys.stdout.write("\n")
+
+def nodeList():
+    dbconnection = opendb()
+    cur = dbconnection.cursor()
+    cur.execute("SELECT NodeID, NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus FROM NodeTable")
+    nodeRows = cur.fetchall()
+    for node in nodeRows:
+        print node
+    closedb(dbconnection)
+
+def subinterfaceList():
+    dbconnection = opendb()
+    cur = dbconnection.cursor()
+    cur.execute("SELECT SubInterfaceID, SubInterfaceUnit, SubInterfaceVLANID, SubInterfaceStatus, PortID FROM SubInterfaceTable")
+    subInterfaceRows = cur.fetchall()
+    for subInterface in subInterfaceRows:
+        print subInterface
+    closedb(dbconnection)
+
+def serviceList():
+    dbconnection = opendb()
+    cur = dbconnection.cursor()
+    cur.execute("SELECT ServiceID, ServiceName, ServiceType FROM ServiceTable")
+    serviceRows = cur.fetchall()
+    for service in serviceRows:
+        print service
+    closedb(dbconnection)
+    
 
 def main(argv):
     sys.stdout.write("lattice\n\n")
@@ -73,26 +101,54 @@ def main(argv):
         exit(1)
     else:
         latticeFunction = sys.argv[1]
+    # This may work better as a switch/case for the initial parameter, then a subroutine to deal with the actual parameters
+    # Check some example code for REST interfaces
     if latticeFunction == 'reinit':
         reinitdb()
     elif latticeFunction == 'node':
         if len(sys.argv) >= 3:
             if sys.argv[2]=='list':
-                print "Printing node list..."
+                print "Printing node list..." 
             elif sys.argv[2]=='add':
-                print "Adding node..."
+                print "Adding node " + sys.argv[3] + "..."
             elif sys.argv[2]=='delete':
-                print "Deleting node..."
+                print "Deleting node " + sys.argv[3] + "..."
             else:
                 print "Error: '" + sys.argv[2] + "' is an unknown node parameter\n"
                 usage()
         else:
             sys.stdout.write("Error: incorrect node parameters\n\n")
             usage()
-    elif latticeFunction == 'service':
-        exit(0)
     elif latticeFunction == 'subinterface':
-        exit(0)
+        if len(sys.argv) >= 3:
+            if sys.argv[2]=='list':
+                print "Printing subinterface list..." 
+            elif sys.argv[2]=='create':
+                print "Creating subinterface " + sys.argv[3] + "..."
+            elif sys.argv[2]=='delete':
+                print "Deleting subinterface " + sys.argv[3] + "..."
+            elif sys.argv[2]=='attach':
+                print "Attaching subinterface " + sys.argv[3] + " to node " + sys.argv[4]
+            else:
+                print "Error: '" + sys.argv[2] + "' is an unknown service parameter\n"
+                usage()
+        else:
+            sys.stdout.write("Error: incorrect service parameters\n\n")
+            usage()
+    elif latticeFunction == 'service':
+        if len(sys.argv) >= 3:
+            if sys.argv[2]=='list':
+                print "Printing service list..." 
+            elif sys.argv[2]=='create':
+                print "Creating service " + sys.argv[3] + "..."
+            elif sys.argv[2]=='delete':
+                print "Deleting service " + sys.argv[3] + "..."
+            else:
+                print "Error: '" + sys.argv[2] + "' is an unknown service parameter\n"
+                usage()
+        else:
+            sys.stdout.write("Error: incorrect service parameters\n\n")
+            usage()
     else:
         sys.stdout.write("Error: Missing parameter\n\n")
         usage()
