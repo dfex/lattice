@@ -74,6 +74,26 @@ def nodeList():
         print node
     closedb(dbconnection)
 
+def nodeAdd(nodeName, nodeType, nodeIPAddress, locationID, nodeStatus):
+    inetRegex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
+    if inetRegex.match(nodeIPAddress):
+        dbconnection = opendb()
+        cur = dbconnection.cursor()
+        cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(nodeHostname, nodeModel, nodeIPAddress, LocationID, nodeStatus))
+    else:
+	    sys.stdout.write("nodeAdd ERROR: Invalid IP Address")
+	    sys.exit(1)
+
+def nodeDelete(nodeIPAddress):
+    inetRegex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$")
+    if inetRegex.match(nodeIPAddress):
+        dbconnection = opendb()
+        cur = dbconnection.cursor()
+        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = VALUES(?,)",(nodeIPAddress))
+    else:
+        sys.stdout.write("nodeDelete ERROR: Invalid IP Address")
+        sys.exit(1)
+
 def subinterfaceList():
     dbconnection = opendb()
     cur = dbconnection.cursor()
