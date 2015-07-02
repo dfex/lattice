@@ -41,7 +41,7 @@ def reinitdb():
         cur.execute("CREATE TABLE LocationTable (LocationID INTEGER PRIMARY KEY ASC, LocationName TEXT NOT NULL, RackID TEXT, RackUnit INTEGER, FacilityName TEXT NOT NULL, FacilityFloor TEXT, FacilityAddress TEXT NOT NULL, FacilityState TEXT NOT NULL, FacilityCountry TEXT NOT NULL, LocationStatus TEXT NOT NULL);")
         cur.execute("CREATE TABLE NodeTable (NodeID INTEGER PRIMARY KEY ASC, NodeName TEXT NOT NULL, NodeType TEXT NOT NULL, NodeIPAddress TEXT NOT NULL, LocationID INTEGER, NodeStatus TEXT, FOREIGN KEY(LocationID) REFERENCES LocationTable(LocationID));")
         cur.execute("CREATE TABLE PortTable (PortID INTEGER PRIMARY KEY ASC, PortName TEXT NOT NULL, PortStatus TEXT, PortSpeed INTEGER, CustomerID TEXT, NodeID INTEGER, FOREIGN KEY(NodeID) REFERENCES NodeTable(NodeID));")
-        cur.execute("CREATE TABLE ServiceTable (ServiceID INTEGER PRIMARY KEY ASC, ServiceName TEXT NOT NULL, ServiceType TEXT NOT NULL, ServiceRouteTarget TEXT, ServiceRouteDistinguisher TEXT);")
+        cur.execute("CREATE TABLE ServiceTable (ServiceID INTEGER PRIMARY KEY ASC, ServiceName TEXT NOT NULL, ServiceType TEXT NOT NULL);")
         cur.execute("CREATE TABLE SubInterfaceTable (SubInterfaceID INTEGER PRIMARY KEY ASC, SubInterfaceUnit INTEGER, SubInterfaceVLANID INTEGER, ServiceID INTEGER, SubInterfaceStatus TEXT NOT NULL, PortID INTEGER, FOREIGN KEY(ServiceID) REFERENCES ServiceTable(ServiceID), FOREIGN KEY (PortID) REFERENCES PortTable(PortID));")
         cur.execute("CREATE TABLE AuthorisationTable (CustomerID INTEGER, UserName TEXT, AuthorisationRole TEXT, PortID INTEGER, SubInterfaceID INTEGER, FOREIGN KEY(CustomerID) REFERENCES CustomerTable(CustomerID), FOREIGN KEY(UserName) REFERENCES UserTable(UserName), FOREIGN KEY(PortID) REFERENCES PortTable(PortID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
         cur.execute("CREATE TABLE ServiceMappingTable (ServiceID TEXT, SubInterfaceID TEXT, FOREIGN KEY(ServiceID) REFERENCES ServiceTable(ServiceID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
@@ -80,11 +80,13 @@ def nodeAdd(nodeName, nodeType, nodeIPAddress, locationID, nodeStatus):
         dbconnection = opendb()
         cur = dbconnection.cursor()
         cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(nodeHostname, nodeModel, nodeIPAddress, LocationID, nodeStatus))
+        closedb(dbconnection)
     else:
 	    sys.stdout.write("nodeAdd ERROR: Invalid IP Address")
 	    sys.exit(1)
 
 def nodeDelete(nodeIPAddress):
+    # Probably should delete by Primary Key, even though nodeIPAddress will be unique
     inetRegex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$")
     if inetRegex.match(nodeIPAddress):
         dbconnection = opendb()
@@ -94,7 +96,7 @@ def nodeDelete(nodeIPAddress):
         sys.stdout.write("nodeDelete ERROR: Invalid IP Address")
         sys.exit(1)
 
-def subinterfaceList():
+def subInterfaceList():
     dbconnection = opendb()
     cur = dbconnection.cursor()
     cur.execute("SELECT SubInterfaceID, SubInterfaceUnit, SubInterfaceVLANID, SubInterfaceStatus, PortID FROM SubInterfaceTable")
@@ -102,6 +104,19 @@ def subinterfaceList():
     for subInterface in subInterfaceRows:
         print subInterface
     closedb(dbconnection)
+
+def subInterfaceCreate():
+    dbconnection = opendb()
+    cur = dbconnection.cursor()
+    cur.execute("INSERT INTO SubInterfaceTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(nodeHostname, nodeModel, nodeIPAddress, LocationID, nodeStatus))
+
+
+def serviceCreate(serviceName, serviceType):
+    dbconnection = opendb()
+    cur = dbconnection.cursor()
+    cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (serviceName, serviceType))
+    closedb(dbconnection)
+
 
 def serviceList():
     dbconnection = opendb()
@@ -121,8 +136,8 @@ def main(argv):
         exit(1)
     else:
         latticeFunction = sys.argv[1]
-    # This may work better as a switch/case for the initial parameter, then a subroutine to deal with the actual parameters
-    # Check some example code for REST interfaces
+    # Okay, this is getting ugly - fix up with argparse library or similar
+    # Think through the grammar so that it makes sense when the REST API is added
     if latticeFunction == 'reinit':
         reinitdb()
     elif latticeFunction == 'node':
