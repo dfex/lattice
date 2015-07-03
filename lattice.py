@@ -80,6 +80,7 @@ def nodeAdd(nodeName, nodeType, nodeIPAddress, locationID, nodeStatus):
         dbconnection = opendb()
         cur = dbconnection.cursor()
         cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(nodeHostname, nodeModel, nodeIPAddress, LocationID, nodeStatus))
+        cur.commit()
         closeDB(dbconnection)
     else:
 	    sys.stdout.write("nodeAdd ERROR: Invalid IP Address")
@@ -92,6 +93,7 @@ def nodeDelete(nodeIPAddress):
         dbconnection = opendb()
         cur = dbconnection.cursor()
         cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = VALUES(?,)",(nodeIPAddress))
+        cur.commit()
         closeDB(dbconnection)
     else:
         sys.stdout.write("nodeDelete ERROR: Invalid IP Address")
@@ -110,24 +112,28 @@ def subInterfaceCreate(subInterfaceUnit, subInterfaceVLANID, serviceID, subInter
     dbconnection = opendb()
     cur = dbconnection.cursor()
     cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, SubInterfaceVLANID, ServiceID, SubInterfaceStatus, PortID) VALUES(?, ?, ?, ?, ?)",(subInterfaceUnit, subInterfaceVLANID, serviceID, subInterfaceStatus, portID))
+    cur.commit()
     closeDB(dbconnection)
 
 def subInterfaceDelete(subInterfaceUnit, portID):
     dbconnection = opendb()
     cur = dbconnection.cursor()
     cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceUnit = VALUES(?,) AND portID = VALUES(?,)",(subInterfaceUnit, portID))
+    cur.commit()
     closeDB(dbconnection)
 
 def serviceCreate(serviceName, serviceType):
     dbconnection = opendb()
     cur = dbconnection.cursor()
     cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (serviceName, serviceType))
+    cur.commit()
     closeDB(dbconnection)
 
 def serviceDelete(serviceName):
     dbconnection = opendb()
     cur = dbconnection.cursor()
     cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (serviceName, serviceType))
+    cur.commit()
     closeDB(dbconnection)
 
 def serviceList():
@@ -144,6 +150,7 @@ def serviceAttach(serviceID, subInterfaceID):
     cur = dbconnection.cursor()
     cur.execute("UPDATE ServiceTable SET ServiceID = VALUES(?,) WHERE SubInterfaceID = VALUES(?,)",(serviceID, subnterfaceID))
     closeDB(dbconnection)
+    cur.commit()
 #   UPDATE Customers
 #   SET ContactName='Alfred Schmidt', City='Hamburg'
 #   WHERE CustomerName='Alfreds Futterkiste';

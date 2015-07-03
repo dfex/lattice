@@ -20,6 +20,7 @@
 * Confirm ELS and EX interface templates to apply to multiple services (eg: EX won't require sub-interface - either add to port, or add port to VLAN) - build j2 templates for each
 * Consider moving to structs/objects rather than passing individual variables - eg: when reading from a node return a populated node object eg: node.name, node.ipAddress etc., then just pass the entire node object to addnode() for writing to db
 * Add functions to import all relevant device information into db schema required for "Service" creation and deletion (eg: populate nodeTable, portTable etc)
+* Add functionality to add and delete all system elements (Locations, Nodes, Ports, Sub-Interfaces, Services, Customers, Users) - ensure deletion of parent removes all child entities
 * Confirm order of operations eg: 
     * Interface/CLI command
     * nodeAdd()
@@ -37,7 +38,6 @@
 	* an 802.1ad double-tagged VLAN will an all-to-one mapping of CVLANs
 	* an 802.1ad double-tagged VLAN with one-to-one mapping of individual CVLANs
 * Build lattice service types as either "Point-to-Point" or "Multipoint" (easy icon for recognition)
-* Add functionality to add and delete all system elements (Locations, Nodes, Ports, Sub-Interfaces, Services, Customers, Users) - ensure deletion of parent removes all child entities
 * Add RESTful API hooks for functions
 * Add multi-threading for device import where it makes sense
 
