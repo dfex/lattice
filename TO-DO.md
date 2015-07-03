@@ -13,7 +13,7 @@
 * ~~Test multi-field row insertion (currently committed)~~
 * ~~Re-factor/build - each run is an atomic operation to populate db - add device & read ports, create service, bind ports to a service~~
 * ~~Add a nuke database parameter (to remove duplicate crap)~~
-* ~~Define configuration templates for service creation (jinja2)~~
+* ~~Define configuration templates for service creation (jinja2) - should they be templates, or a list of rpc calls?~~
 * Confirm ELS and EX interface templates to apply to multiple services (eg: EX won't require sub-interface - either add to port, or add port to VLAN) - build j2 templates for each
 * Add functions to import all relevant device information into db schema required for "Service" creation and deletion (eg: populate nodeTable, portTable etc)
 * Fix up paramter parsing if/elif/else hell with argparse lib
@@ -28,7 +28,8 @@
     * Pull down port information
     * Add port information to portTable
     * Close db connection (inside business logic, or part of controller?
-* Add functions to write out from db to device configuration via j2 templates
+* Add functions to write out from db to device configuration via j2 templates (? or just the required RPC calls?)
+* Be sure to add interface description with a formatted service identifier - check description-string limitations
 * Create a "service" between two nodes that is either:
 	* an 802.1q tagged or untagged VLAN
 	* an 802.1ad double-tagged VLAN will an all-to-one mapping of CVLANs
@@ -57,3 +58,5 @@
 * http://blog.tylerc.me/code/2015/05/04/beyond-junos-eznc-pyez/
 * http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/
 * https://github.com/vshaumann/My-Data-Science-Resources
+* https://www.juniper.net/techpubs/en_US/junos14.1/topics/task/configuration/qinq-tunneling-ex-series-cli-els.html
+* https://www.juniper.net/techpubs/en_US/junos14.1/topics/task/configuration/l2pt-ex-series-cli-els.html

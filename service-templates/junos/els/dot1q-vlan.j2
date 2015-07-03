@@ -4,3 +4,27 @@ vlans {
         vlan-id {%- vlan-id %}
     }
 }
+
+## per-interface l2-protocol tunneling:
+#protocols {
+#    lldp {
+#        interface all;
+#    }
+#    lldp-med {
+#        interface all;
+#    }
+#    layer2-control {
+#        nonstop-bridging;
+#        mac-rewrite {
+#            interface ge-0/0/3 {
+#                protocol {
+#                    stp;
+#                    vtp;
+#                    cdp;
+#                }
+#            }
+#        }
+#    }
+#}
+#
+# add in per-interface logical sub-interfaces
