@@ -14,6 +14,7 @@
 * ~~Re-factor/build - each run is an atomic operation to populate db - add device & read ports, create service, bind ports to a service~~
 * ~~Add a nuke database parameter (to remove duplicate crap)~~
 * ~~Define configuration templates for service creation (jinja2) - should they be templates, or a list of rpc calls?~~
+* Switch from camelCase to snake_case
 * Fix up paramter parsing if/elif/else hell with argparse lib
 * Re-visit db schema and adjust functions to match - eg: referencing via PKs (IDs), only required/relevant fields for functions, and map to end-user operational flow (more tables, rigour around NOT NULL requirements)
 * Break out service configuration from definition/type
@@ -60,3 +61,4 @@
 * https://github.com/vshaumann/My-Data-Science-Resources
 * https://www.juniper.net/techpubs/en_US/junos14.1/topics/task/configuration/qinq-tunneling-ex-series-cli-els.html
 * https://www.juniper.net/techpubs/en_US/junos14.1/topics/task/configuration/l2pt-ex-series-cli-els.html
+* http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api#restful
