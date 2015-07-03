@@ -46,7 +46,7 @@ def reinitdb():
         cur.execute("CREATE TABLE AuthorisationTable (CustomerID INTEGER, UserName TEXT, AuthorisationRole TEXT, PortID INTEGER, SubInterfaceID INTEGER, FOREIGN KEY(CustomerID) REFERENCES CustomerTable(CustomerID), FOREIGN KEY(UserName) REFERENCES UserTable(UserName), FOREIGN KEY(PortID) REFERENCES PortTable(PortID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
         cur.execute("CREATE TABLE ServiceMappingTable (ServiceID TEXT, SubInterfaceID TEXT, FOREIGN KEY(ServiceID) REFERENCES ServiceTable(ServiceID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
         cur.execute("CREATE TABLE TransactionLog (TransactionID INTEGER PRIMARY KEY ASC, TransactionTimeStamp TEXT, UserID TEXT, IPAddress TEXT, EventType TEXT, PortID TEXT, SubInterfaceID TEXT, EventDescription TEXT);")
-        closedb(dbconnection)
+        closeDB(dbconnection)
     else:
         return 0
 
@@ -72,7 +72,7 @@ def nodeList():
     nodeRows = cur.fetchall()
     for node in nodeRows:
         print node
-    closedb(dbconnection)
+    closeDB(dbconnection)
 
 def nodeAdd(nodeName, nodeType, nodeIPAddress, locationID, nodeStatus):
     inetRegex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
@@ -80,7 +80,7 @@ def nodeAdd(nodeName, nodeType, nodeIPAddress, locationID, nodeStatus):
         dbconnection = opendb()
         cur = dbconnection.cursor()
         cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(nodeHostname, nodeModel, nodeIPAddress, LocationID, nodeStatus))
-        closedb(dbconnection)
+        closeDB(dbconnection)
     else:
 	    sys.stdout.write("nodeAdd ERROR: Invalid IP Address")
 	    sys.exit(1)
@@ -92,6 +92,7 @@ def nodeDelete(nodeIPAddress):
         dbconnection = opendb()
         cur = dbconnection.cursor()
         cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = VALUES(?,)",(nodeIPAddress))
+        closeDB(dbconnection)
     else:
         sys.stdout.write("nodeDelete ERROR: Invalid IP Address")
         sys.exit(1)
@@ -103,20 +104,31 @@ def subInterfaceList():
     subInterfaceRows = cur.fetchall()
     for subInterface in subInterfaceRows:
         print subInterface
-    closedb(dbconnection)
+    closeDB(dbconnection)
 
-def subInterfaceCreate():
+def subInterfaceCreate(subInterfaceUnit, subInterfaceVLANID, serviceID, subInterfaceStatus, portID):
     dbconnection = opendb()
     cur = dbconnection.cursor()
-    cur.execute("INSERT INTO SubInterfaceTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(nodeHostname, nodeModel, nodeIPAddress, LocationID, nodeStatus))
+    cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, SubInterfaceVLANID, ServiceID, SubInterfaceStatus, PortID) VALUES(?, ?, ?, ?, ?)",(subInterfaceUnit, subInterfaceVLANID, serviceID, subInterfaceStatus, portID))
+    closeDB(dbconnection)
 
+def subInterfaceDelete(subInterfaceUnit, portID):
+    dbconnection = opendb()
+    cur = dbconnection.cursor()
+    cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceUnit = VALUES(?,) AND portID = VALUES(?,)",(subInterfaceUnit, portID))
+    closeDB(dbconnection)
 
 def serviceCreate(serviceName, serviceType):
     dbconnection = opendb()
     cur = dbconnection.cursor()
     cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (serviceName, serviceType))
-    closedb(dbconnection)
+    closeDB(dbconnection)
 
+def serviceDelete(serviceName):
+    dbconnection = opendb()
+    cur = dbconnection.cursor()
+    cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (serviceName, serviceType))
+    closeDB(dbconnection)
 
 def serviceList():
     dbconnection = opendb()
@@ -125,8 +137,7 @@ def serviceList():
     serviceRows = cur.fetchall()
     for service in serviceRows:
         print service
-    closedb(dbconnection)
-    
+    closeDB(dbconnection)
 
 def main(argv):
     sys.stdout.write("lattice\n\n")
