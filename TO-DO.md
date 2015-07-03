@@ -13,7 +13,10 @@
 * ~~Test multi-field row insertion (currently committed)~~
 * ~~Re-factor/build - each run is an atomic operation to populate db - add device & read ports, create service, bind ports to a service~~
 * ~~Add a nuke database parameter (to remove duplicate crap)~~
+* ~~Define configuration templates for service creation (jinja2)~~
 * Add functions to import all relevant device information into db schema required for "Service" creation and deletion (eg: populate nodeTable, portTable etc)
+* Fix up paramter parsing if/elif/else hell with argparse lib
+* Consider moving to structs/objects rather than passing individual variables - eg: when reading from a node return a populated node object eg: node.name, node.ipAddress etc., then just pass the entire node object to addnode() for writing to db
 * Confirm order of operations eg: 
     * Interface/CLI command
     * nodeAdd()
@@ -24,7 +27,7 @@
     * Pull down port information
     * Add port information to portTable
     * Close db connection (inside business logic, or part of controller?
-* Add functions to write out from db to device configuration
+* Add functions to write out from db to device configuration via j2 templates
 * Create a "service" between two nodes that is either:
 	* an 802.1q tagged or untagged VLAN
 	* an 802.1ad double-tagged VLAN will an all-to-one mapping of CVLANs

@@ -1,0 +1,11 @@
+vlans {
+    {%- vlan-name %} {
+        description "{%- vlan-description %}"
+        vlan-id {%- vlan-ctag %}
+        dot1q-tunneling {
+            layer2-protocol-tunneling {
+                all;
+            }
+        }
+    }
+}
