@@ -139,6 +139,15 @@ def serviceList():
         print service
     closeDB(dbconnection)
 
+def serviceAttach(serviceID, subInterfaceID):
+    dbconnection = opendb()
+    cur = dbconnection.cursor()
+    cur.execute("UPDATE ServiceTable SET ServiceID = VALUES(?,) WHERE SubInterfaceID = VALUES(?,)",(serviceID, subnterfaceID))
+    closeDB(dbconnection)
+#   UPDATE Customers
+#   SET ContactName='Alfred Schmidt', City='Hamburg'
+#   WHERE CustomerName='Alfreds Futterkiste';
+
 def main(argv):
     sys.stdout.write("lattice\n\n")
     latticeFunction=''
