@@ -1,4 +1,4 @@
-##TODO:
+##TODO
 
 * ~~open up connection to switch~~
 * ~~query interfaces~~
@@ -47,14 +47,15 @@
 * Will need to adjust chassisInventory for multi-device/multiRE clusters or VCs
 
 
-* Phase 2: 
+##Phase 2 
 * Update device interactions such that they could operate in a multi-vendor environment (using Node type field to distinguish)
 * Test-driven Web app in Django or lighter weight - selenium integration
 * Add a "flare" table so that Customer can have an icon associated with their connection
 * Add custom logic for certain end-points (eg: AWS, Azure or GCE login credentials)
 * Phase 3: iphone app in Swift.  Connections should be wizard-based full-screen rather than rows of config information (eg: swipe between steps)
 
-**References:
+References:
+
 * http://zetcode.com/db/sqlitepythontutorial/
 * http://blog.tylerc.me/code/2015/05/04/beyond-junos-eznc-pyez/
 * http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/
