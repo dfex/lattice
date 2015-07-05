@@ -8,6 +8,12 @@ import junosconnect
 from getpass import getpass
 from pprint import pprint
 
+class Node:
+    '''Represents a network switch'''
+    def __init__(self):
+        pass
+    self.ipaddress
+
 def opendb():
     try:
         dbconnection = sqlite3.connect('lattice.sqlite')
