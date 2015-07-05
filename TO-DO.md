@@ -14,7 +14,7 @@
 * ~~Re-factor/build - each run is an atomic operation to populate db - add device & read ports, create service, bind ports to a service~~
 * ~~Add a nuke database parameter (to remove duplicate crap)~~
 * ~~Define configuration templates for service creation (jinja2) - should they be templates, or a list of rpc calls?~~
-* Switch from camelCase to snake_case
+* ~~Switch from camelCase to snake_case~~
 * Fix up paramter parsing if/elif/else hell with argparse lib
 * Re-visit db schema and adjust functions to match - eg: referencing via PKs (IDs), only required/relevant fields for functions, and map to end-user operational flow (more tables, rigour around NOT NULL requirements)
 * Break out service configuration from definition/type
@@ -44,7 +44,8 @@
 
 
 ##TOFIX:
-* Will need to adjust chassisInventory for multi-device/multiRE clusters or VCs
+* Will need to adjust chassisInventory for multi-device/multiRE clusters or VCs down the track
+
 
 
 ##Phase 2 

@@ -8,22 +8,22 @@ import junosconnect
 from getpass import getpass
 from pprint import pprint
 
-def opendb():
+def open_db():
     try:
-        dbconnection = sqlite3.connect('lattice.sqlite')
-        return dbconnection
+        db_connection = sqlite3.connect('lattice.sqlite')
+        return db_connection
     except sqlite3.Error, e:
         print "Error %s:" % e.args[0]
         sys.exit(1)	
 
-def closeDB(dbconnection):
-    dbconnection.close()
+def close_db(db_connection):
+    db_connection.close()
 
-def reinitdb():
+def reinit_db():
     confirmation = raw_input("Re-initialise lattice db - are you sure? (y/n)")
     if confirmation.upper == 'Y':
-        dbconnection = opendb()
-        cur = dbconnection.cursor()
+        db_connection = open_db()
+        cur = db_connection.cursor()
         cur.execute("PRAGMA foreign_keys")
         cur.execute("DROP TABLE IF EXISTS CustomerTable;")
         cur.execute("DROP TABLE IF EXISTS UserTable;")
@@ -46,7 +46,7 @@ def reinitdb():
         cur.execute("CREATE TABLE AuthorisationTable (CustomerID INTEGER, UserName TEXT, AuthorisationRole TEXT, PortID INTEGER, SubInterfaceID INTEGER, FOREIGN KEY(CustomerID) REFERENCES CustomerTable(CustomerID), FOREIGN KEY(UserName) REFERENCES UserTable(UserName), FOREIGN KEY(PortID) REFERENCES PortTable(PortID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
         cur.execute("CREATE TABLE ServiceMappingTable (ServiceID TEXT, SubInterfaceID TEXT, FOREIGN KEY(ServiceID) REFERENCES ServiceTable(ServiceID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
         cur.execute("CREATE TABLE TransactionLog (TransactionID INTEGER PRIMARY KEY ASC, TransactionTimeStamp TEXT, UserID TEXT, IPAddress TEXT, EventType TEXT, PortID TEXT, SubInterfaceID TEXT, EventDescription TEXT);")
-        closeDB(dbconnection)
+        close_db(db_connection)
     else:
         return 0
 
@@ -65,109 +65,106 @@ def usage():
     sys.stdout.write("Usage: lattice service list\n")
     sys.stdout.write("\n")
 
-def nodeList():
-    dbconnection = opendb()
-    cur = dbconnection.cursor()
+def node_list():
+    db_connection = open_db()
+    cur = db_connection.cursor()
     cur.execute("SELECT NodeID, NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus FROM NodeTable")
-    nodeRows = cur.fetchall()
-    for node in nodeRows:
+    node_Rows = cur.fetchall()
+    for node in node_Rows:
         print node
-    closeDB(dbconnection)
+    close_db(db_connection)
 
-def nodeAdd(nodeName, nodeType, nodeIPAddress, locationID, nodeStatus):
-    inetRegex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
-    if inetRegex.match(nodeIPAddress):
-        dbconnection = opendb()
-        cur = dbconnection.cursor()
-        cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(nodeHostname, nodeModel, nodeIPAddress, LocationID, nodeStatus))
+def node_add(node_name, node_type, node_ip_address, location_id, node_status):
+    inet_Regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
+    if inet_Regex.match(node_ip_address):
+        db_connection = open_db()
+        cur = db_connection.cursor()
+        cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(node_hostname, node_model, node_ip_address, location_id, node_status))
         cur.commit()
-        closeDB(dbconnection)
+        close_db(db_connection)
     else:
 	    sys.stdout.write("nodeAdd ERROR: Invalid IP Address")
 	    sys.exit(1)
 
-def nodeDelete(nodeIPAddress):
+def node_delete(node_ip_address):
     # Probably should delete by Primary Key, even though nodeIPAddress will be unique
-    inetRegex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$")
-    if inetRegex.match(nodeIPAddress):
-        dbconnection = opendb()
-        cur = dbconnection.cursor()
-        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = VALUES(?,)",(nodeIPAddress))
+    inet_regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$")
+    if inet_regex.match(node_ip_address):
+        db_connection = open_db()
+        cur = db_connection.cursor()
+        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = VALUES(?,)",(node_ip_address))
         cur.commit()
-        closeDB(dbconnection)
+        close_db(db_connection)
     else:
         sys.stdout.write("nodeDelete ERROR: Invalid IP Address")
         sys.exit(1)
 
-def subInterfaceList():
+def sub_interface_list():
     dbconnection = opendb()
-    cur = dbconnection.cursor()
+    cur = db_connection.cursor()
     cur.execute("SELECT SubInterfaceID, SubInterfaceUnit, SubInterfaceVLANID, SubInterfaceStatus, PortID FROM SubInterfaceTable")
-    subInterfaceRows = cur.fetchall()
-    for subInterface in subInterfaceRows:
-        print subInterface
-    closeDB(dbconnection)
+    sub_interface_rows = cur.fetchall()
+    for sub_interface in sub_interface_rows:
+        print sub_interface
+    close_db(db_connection)
 
-def subInterfaceCreate(subInterfaceUnit, subInterfaceVLANID, serviceID, subInterfaceStatus, portID):
-    dbconnection = opendb()
-    cur = dbconnection.cursor()
-    cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, SubInterfaceVLANID, ServiceID, SubInterfaceStatus, PortID) VALUES(?, ?, ?, ?, ?)",(subInterfaceUnit, subInterfaceVLANID, serviceID, subInterfaceStatus, portID))
+def sub_interface_create(sub_interface_unit, sub_interface_vlan_id, service_id, sub_interface_status, port_id):
+    db_connection = open_db()
+    cur = db_connection.cursor()
+    cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, SubInterfaceVLANID, ServiceID, SubInterfaceStatus, PortID) VALUES(?, ?, ?, ?, ?)",(sub_interface_unit, sub_interface_vlan_id, service_id, sub_interface_status, port_id))
     cur.commit()
-    closeDB(dbconnection)
+    close_db(db_connection)
 
-def subInterfaceDelete(subInterfaceUnit, portID):
-    dbconnection = opendb()
-    cur = dbconnection.cursor()
-    cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceUnit = VALUES(?,) AND portID = VALUES(?,)",(subInterfaceUnit, portID))
+def sub_interface_delete(sub_interface_unit, port_id):
+    db_connection = open_db()
+    cur = db_connection.cursor()
+    cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceUnit = VALUES(?,) AND portID = VALUES(?,)",(sub_interface_unit, port_id))
     cur.commit()
-    closeDB(dbconnection)
+    close_db(db_connection)
 
-def serviceCreate(serviceName, serviceType):
-    dbconnection = opendb()
-    cur = dbconnection.cursor()
-    cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (serviceName, serviceType))
+def service_create(service_name, service_type):
+    db_connection = open_db()
+    cur = db_connection.cursor()
+    cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (service_name, service_type))
     cur.commit()
-    closeDB(dbconnection)
+    close_db(db_connection)
 
-def serviceDelete(serviceName):
-    dbconnection = opendb()
-    cur = dbconnection.cursor()
-    cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (serviceName, serviceType))
+def service_delete(service_name):
+    db_connection = open_db()
+    cur = db_connection.cursor()
+    cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (service_name, service_type))
     cur.commit()
-    closeDB(dbconnection)
+    close_db(db_connection)
 
-def serviceList():
-    dbconnection = opendb()
-    cur = dbconnection.cursor()
+def service_list():
+    db_connection = open_db()
+    cur = db_connection.cursor()
     cur.execute("SELECT ServiceID, ServiceName, ServiceType FROM ServiceTable")
-    serviceRows = cur.fetchall()
-    for service in serviceRows:
+    service_rows = cur.fetchall()
+    for service in service_rows:
         print service
-    closeDB(dbconnection)
+    close_db(db_connection)
 
-def serviceAttach(serviceID, subInterfaceID):
-    dbconnection = opendb()
-    cur = dbconnection.cursor()
-    cur.execute("UPDATE ServiceTable SET ServiceID = VALUES(?,) WHERE SubInterfaceID = VALUES(?,)",(serviceID, subnterfaceID))
-    closeDB(dbconnection)
+def service_attach(service_id, sub_interface_id):
+    db_connection = open_db()
+    cur = db_connection.cursor()
+    cur.execute("UPDATE ServiceTable SET ServiceID = VALUES(?,) WHERE SubInterfaceID = VALUES(?,)",(service_id, subnterface_id))
+    close_db(db_connection)
     cur.commit()
-#   UPDATE Customers
-#   SET ContactName='Alfred Schmidt', City='Hamburg'
-#   WHERE CustomerName='Alfreds Futterkiste';
 
 def main(argv):
     sys.stdout.write("lattice\n\n")
-    latticeFunction=''
+    lattice_Function=''
     if len(sys.argv) <= 1:
         usage()
         exit(1)
     else:
-        latticeFunction = sys.argv[1]
+        lattice_function = sys.argv[1]
     # Okay, this is getting ugly - fix up with argparse library or similar
     # Think through the grammar so that it makes sense when the REST API is added
-    if latticeFunction == 'reinit':
-        reinitdb()
-    elif latticeFunction == 'node':
+    if lattice_function == 'reinit':
+        reinit_db()
+    elif lattice_function == 'node':
         if len(sys.argv) >= 3:
             if sys.argv[2]=='list':
                 print "Printing node list..." 
@@ -181,7 +178,7 @@ def main(argv):
         else:
             sys.stdout.write("Error: incorrect node parameters\n\n")
             usage()
-    elif latticeFunction == 'subinterface':
+    elif lattice_function == 'subinterface':
         if len(sys.argv) >= 3:
             if sys.argv[2]=='list':
                 print "Printing subinterface list..." 
@@ -197,7 +194,7 @@ def main(argv):
         else:
             sys.stdout.write("Error: incorrect service parameters\n\n")
             usage()
-    elif latticeFunction == 'service':
+    elif lattice_function == 'service':
         if len(sys.argv) >= 3:
             if sys.argv[2]=='list':
                 print "Printing service list..." 
