@@ -141,7 +141,7 @@ def service_create(service_name, service_type):
 def service_delete(service_name):
     db_connection = open_db()
     cur = db_connection.cursor()
-    cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (service_name, service_type))
+    cur.execute("DELETE FROM ServiceTable WHERE ServiceName = ?", (service_name,))
     db_connection.commit()
     close_db(db_connection)
 
@@ -213,10 +213,13 @@ def main(argv):
         if len(sys.argv) >= 3:
             if sys.argv[2]=='list':
                 print "Printing service list..." 
+                service_list()
             elif sys.argv[2]=='create':
                 print "Creating service " + sys.argv[3] + "..."
+                service_create(sys.argv[3], 'vpls')
             elif sys.argv[2]=='delete':
                 print "Deleting service " + sys.argv[3] + "..."
+                service_delete(sys.argv[3])
             else:
                 print "Error: '" + sys.argv[2] + "' is an unknown service parameter\n"
                 usage()
