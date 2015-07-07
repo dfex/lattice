@@ -109,7 +109,7 @@ def node_delete(node_ip_address):
         sys.exit(1)
 
 def sub_interface_list():
-    dbconnection = opendb()
+    db_connection = open_db()
     cur = db_connection.cursor()
     cur.execute("SELECT SubInterfaceID, SubInterfaceUnit, SubInterfaceVLANID, SubInterfaceStatus, PortID FROM SubInterfaceTable")
     sub_interface_rows = cur.fetchall()
@@ -193,9 +193,11 @@ def main(argv):
     elif lattice_function == 'subinterface':
         if len(sys.argv) >= 3:
             if sys.argv[2]=='list':
-                print "Printing subinterface list..." 
+                print "Printing subinterface list..."
+                sub_interface_list()
             elif sys.argv[2]=='create':
                 print "Creating subinterface " + sys.argv[3] + "..."
+                sub_interface_create(sys.argv[3], sys.argv[3], 'sid'+sys.argv[3], 'Active', 'ge-0/0/0')
             elif sys.argv[2]=='delete':
                 print "Deleting subinterface " + sys.argv[3] + "..."
             elif sys.argv[2]=='attach':
