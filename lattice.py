@@ -127,7 +127,7 @@ def sub_interface_create(sub_interface_unit, sub_interface_vlan_id, service_id, 
 def sub_interface_delete(sub_interface_unit, port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
-    cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceUnit = VALUES(?,) AND portID = VALUES(?,)",(sub_interface_unit, port_id))
+    cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceUnit = ? AND portID = ?",(sub_interface_unit, port_id))
     db_connection.commit()
     close_db(db_connection)
 
@@ -200,6 +200,7 @@ def main(argv):
                 sub_interface_create(sys.argv[3], sys.argv[3], 'sid'+sys.argv[3], 'Active', 'ge-0/0/0')
             elif sys.argv[2]=='delete':
                 print "Deleting subinterface " + sys.argv[3] + "..."
+                sub_interface_delete(sys.argv[3], 'ge-0/0/0')
             elif sys.argv[2]=='attach':
                 print "Attaching subinterface " + sys.argv[3] + " to node " + sys.argv[4]
             else:
