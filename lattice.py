@@ -21,10 +21,14 @@ def close_db(db_connection):
 
 def reinit_db():
     confirmation = raw_input("Re-initialise lattice db - are you sure? (y/n)")
-    if confirmation.upper == 'Y':
+    if confirmation.upper() == 'Y':
+        print "Re-initialising db"
+        print "Opening db"
         db_connection = open_db()
+        print "Opened db"
         cur = db_connection.cursor()
         cur.execute("PRAGMA foreign_keys")
+        print "Dropping existing tables"
         cur.execute("DROP TABLE IF EXISTS CustomerTable;")
         cur.execute("DROP TABLE IF EXISTS UserTable;")
         cur.execute("DROP TABLE IF EXISTS LocationTable;")
@@ -36,6 +40,7 @@ def reinit_db():
         cur.execute("DROP TABLE IF EXISTS ServiceMappingTable;")
         cur.execute("DROP TABLE IF EXISTS TransactionLog;")
         # switch this across to a dict/array-based description of the db and load it in. 
+        print "Populating schema"
         cur.execute("CREATE TABLE CustomerTable (CustomerID INTEGER PRIMARY KEY ASC, CustomerName TEXT, BillingEmailAddress TEXT, CustomerStatus TEXT);")
         cur.execute("CREATE TABLE UserTable (UserID INTEGER PRIMARY KEY ASC, UserName TEXT, UserPassword TEXT, UserStatus TEXT);")
         cur.execute("CREATE TABLE LocationTable (LocationID INTEGER PRIMARY KEY ASC, LocationName TEXT NOT NULL, RackID TEXT, RackUnit INTEGER, FacilityName TEXT NOT NULL, FacilityFloor TEXT, FacilityAddress TEXT NOT NULL, FacilityState TEXT NOT NULL, FacilityCountry TEXT NOT NULL, LocationStatus TEXT NOT NULL);")
@@ -46,8 +51,11 @@ def reinit_db():
         cur.execute("CREATE TABLE AuthorisationTable (CustomerID INTEGER, UserName TEXT, AuthorisationRole TEXT, PortID INTEGER, SubInterfaceID INTEGER, FOREIGN KEY(CustomerID) REFERENCES CustomerTable(CustomerID), FOREIGN KEY(UserName) REFERENCES UserTable(UserName), FOREIGN KEY(PortID) REFERENCES PortTable(PortID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
         cur.execute("CREATE TABLE ServiceMappingTable (ServiceID TEXT, SubInterfaceID TEXT, FOREIGN KEY(ServiceID) REFERENCES ServiceTable(ServiceID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
         cur.execute("CREATE TABLE TransactionLog (TransactionID INTEGER PRIMARY KEY ASC, TransactionTimeStamp TEXT, UserID TEXT, IPAddress TEXT, EventType TEXT, PortID TEXT, SubInterfaceID TEXT, EventDescription TEXT);")
+        print "Closing db"
         close_db(db_connection)
+        print "DB closed"
     else:
+        print "Confirmation cancelled"
         return 0
 
 def usage():
