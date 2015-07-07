@@ -1,6 +1,6 @@
 vlans {
-    {%- vlan-name %} {
-        description "{%- vlan-description %}"
-        vlan-id {%- vlan-ctag %}
+    {%- vlan_name %} {
+        description "{%- vlan_description %}"
+        interface {%- port_name %}
     }
 }

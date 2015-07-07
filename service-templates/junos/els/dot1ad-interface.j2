@@ -1,0 +1,25 @@
+interfaces {                                   
+    ge-0/0/20 {
+        description "{%- ifd_description %}";
+        flexible-vlan-tagging;
+        encapsulation extended-vlan-bridge;
+        unit {%- subinterface %} {
+            vlan-id {%- subinterface-id %};
+            input-vlan-map push;
+            output-vlan-map pop;
+        }
+    }
+
+protocols {
+    layer2-control {
+        mac-rewrite {
+            interface {%- interface_name %} {
+                protocol {
+                    stp;
+                    vtp;
+                    cdp;
+                }
+            }
+        }
+    }
+}
