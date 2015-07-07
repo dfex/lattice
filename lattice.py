@@ -100,8 +100,9 @@ def node_delete(node_ip_address):
     if inet_regex.match(node_ip_address):
         db_connection = open_db()
         cur = db_connection.cursor()
-        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = VALUES(?,)",(node_ip_address))
-        cur.commit()
+        print "Deleting " + node_ip_address
+        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = ?",(node_ip_address,))
+        db_connection.commit()
         close_db(db_connection)
     else:
         sys.stdout.write("nodeDelete ERROR: Invalid IP Address")
@@ -120,28 +121,28 @@ def sub_interface_create(sub_interface_unit, sub_interface_vlan_id, service_id, 
     db_connection = open_db()
     cur = db_connection.cursor()
     cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, SubInterfaceVLANID, ServiceID, SubInterfaceStatus, PortID) VALUES(?, ?, ?, ?, ?)",(sub_interface_unit, sub_interface_vlan_id, service_id, sub_interface_status, port_id))
-    cur.commit()
+    db_connection.commit()
     close_db(db_connection)
 
 def sub_interface_delete(sub_interface_unit, port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
     cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceUnit = VALUES(?,) AND portID = VALUES(?,)",(sub_interface_unit, port_id))
-    cur.commit()
+    db_connection.commit()
     close_db(db_connection)
 
 def service_create(service_name, service_type):
     db_connection = open_db()
     cur = db_connection.cursor()
     cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (service_name, service_type))
-    cur.commit()
+    db_connection.commit()
     close_db(db_connection)
 
 def service_delete(service_name):
     db_connection = open_db()
     cur = db_connection.cursor()
     cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (service_name, service_type))
-    cur.commit()
+    db_connection.commit()
     close_db(db_connection)
 
 def service_list():
@@ -158,7 +159,7 @@ def service_attach(service_id, sub_interface_id):
     cur = db_connection.cursor()
     cur.execute("UPDATE ServiceTable SET ServiceID = VALUES(?,) WHERE SubInterfaceID = VALUES(?,)",(service_id, subnterface_id))
     close_db(db_connection)
-    cur.commit()
+    db_connection.commit()
 
 def main(argv):
     sys.stdout.write("lattice\n\n")
@@ -182,6 +183,7 @@ def main(argv):
                 node_add(sys.argv[3], 'junos_ex', '192.168.100.1', 'NEXTDC B1', 'Up')
             elif sys.argv[2]=='delete':
                 print "Deleting node " + sys.argv[3] + "..."
+                node_delete(sys.argv[3])
             else:
                 print "Error: '" + sys.argv[2] + "' is an unknown node parameter\n"
                 usage()
