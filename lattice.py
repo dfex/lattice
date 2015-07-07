@@ -180,7 +180,7 @@ def main(argv):
                 node_list()
             elif sys.argv[2]=='add':
                 print "Adding node " + sys.argv[3] + "..."
-                node_add(sys.argv[3], 'junos_ex', '192.168.100.1', 'NEXTDC B1', 'Up')
+                node_add('ex2200', 'junos_ex', sys.argv[3], 'NEXTDC B1', 'Up')
             elif sys.argv[2]=='delete':
                 print "Deleting node " + sys.argv[3] + "..."
                 node_delete(sys.argv[3])
