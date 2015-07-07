@@ -87,8 +87,8 @@ def node_add(node_name, node_type, node_ip_address, location_id, node_status):
     if inet_Regex.match(node_ip_address):
         db_connection = open_db()
         cur = db_connection.cursor()
-        cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(node_hostname, node_model, node_ip_address, location_id, node_status))
-        cur.commit()
+        cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(node_name, node_type, node_ip_address, location_id, node_status))
+        db_connection.commit()
         close_db(db_connection)
     else:
 	    sys.stdout.write("nodeAdd ERROR: Invalid IP Address")
@@ -175,9 +175,11 @@ def main(argv):
     elif lattice_function == 'node':
         if len(sys.argv) >= 3:
             if sys.argv[2]=='list':
-                print "Printing node list..." 
+                print "Printing node list..."
+                node_list()
             elif sys.argv[2]=='add':
                 print "Adding node " + sys.argv[3] + "..."
+                node_add(sys.argv[3], 'junos_ex', '192.168.100.1', 'NEXTDC B1', 'Up')
             elif sys.argv[2]=='delete':
                 print "Deleting node " + sys.argv[3] + "..."
             else:
