@@ -5,6 +5,7 @@
 import re, sys, getopt
 import sqlite3
 import junosconnect
+import constants
 from getpass import getpass
 from pprint import pprint
 
@@ -91,7 +92,7 @@ def node_add(node_name, node_type, node_ip_address, location_id, node_status):
         db_connection.commit()
         close_db(db_connection)
     else:
-	    sys.stdout.write("nodeAdd ERROR: Invalid IP Address")
+	    sys.stdout.write("node_add() ERROR: Invalid IP Address")
 	    sys.exit(1)
 
 def node_delete(node_ip_address):
@@ -105,7 +106,7 @@ def node_delete(node_ip_address):
         db_connection.commit()
         close_db(db_connection)
     else:
-        sys.stdout.write("nodeDelete ERROR: Invalid IP Address")
+        sys.stdout.write("node_delete() ERROR: Invalid IP Address")
         sys.exit(1)
 
 def sub_interface_list():

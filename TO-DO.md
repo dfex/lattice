@@ -15,13 +15,8 @@
 * ~~Add a nuke database parameter (to remove duplicate crap)~~
 * ~~Define configuration templates for service creation (jinja2) - should they be templates, or a list of rpc calls?~~
 * ~~Switch from camelCase to snake_case~~
-* Fix up paramter parsing if/elif/else hell with argparse lib
-* Explore moving to structs/objects rather than passing individual variables - eg: when reading from a node return a populated node object eg: node.name, node.ipAddress etc., then just pass the entire node object to addnode() for writing to db
-* Re-visit db schema and adjust functions to match - eg: referencing via PKs (IDs), only required/relevant fields for functions, and map to end-user operational flow (more tables, rigour around NOT NULL requirements)
-* Break out service configuration from definition/type
-* Confirm ELS and EX interface templates to apply to multiple services (eg: EX won't require sub-interface - either add to port, or add port to VLAN) - build j2 templates for each
 * ~~Add functions to import all relevant device information into db schema required for "Service" creation and deletion (eg: populate nodeTable, portTable etc)~~
-* Add functionality to add and delete all system elements (Locations, Nodes, Ports, Sub-Interfaces, Services, Customers, Users) - ensure deletion of parent removes all child entities
+* Fix up parameter parsing if/elif/else hell with argparse lib
 * Confirm order of operations eg: 
     * Interface/CLI command
     * nodeAdd()
@@ -33,6 +28,11 @@
     * Add port information to portTable
     * Close db connection (inside business logic, or part of controller?
 * Add functions to write out from db to device configuration via j2 templates (? or just the required RPC calls?)
+* Explore moving to structs/objects rather than passing individual variables - eg: when reading from a node return a populated node object eg: node.name, node.ipAddress etc., then just pass the entire node object to addnode() for writing to db
+* Re-visit db schema and adjust functions to match - eg: referencing via PKs (IDs), only required/relevant fields for functions, and map to end-user operational flow (more tables, rigour around NOT NULL requirements)
+* Break out service configuration from definition/type
+* Confirm ELS and EX interface templates to apply to multiple services (eg: EX won't require sub-interface - either add to port, or add port to VLAN) - build j2 templates for each
+* Add functionality to add and delete all system elements (Locations, Nodes, Ports, Sub-Interfaces, Services, Customers, Users) - ensure deletion of parent removes all child entities
 * Be sure to add interface description with a formatted service identifier - check description-string limitations
 * Create a "service" between two nodes that is either:
 	* an 802.1q tagged or untagged VLAN
@@ -40,13 +40,9 @@
 	* an 802.1ad double-tagged VLAN with one-to-one mapping of individual CVLANs
 * Build lattice service types as either "Point-to-Point" or "Multipoint" (easy icon for recognition)
 * Add RESTful API hooks for functions
-* Add multi-threading for device import where it makes sense
-
 
 ##TOFIX:
 * Will need to adjust chassisInventory for multi-device/multiRE clusters or VCs down the track
-
-
 
 ##Phase 2 
 * Update device interactions such that they could operate in a multi-vendor environment (using Node type field to distinguish)
