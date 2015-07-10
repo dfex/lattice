@@ -1,3 +1,24 @@
+Rough Sequence for a node add:
+
+node add 192.168.100.1 username password node-type
+
+capture above detail in node instance (Class)
+
+set node_status of Node to NEW/UNREAD
+
+connect to node 
+- pull down extra detail like serial number and add it to node instance
+- set node_status to READ(Y)
+- write node detail to db
+- pull down port information - port_add() - object relationship will be stored in db only - no need for class to have associations    
+- set port_statuses to AVAILABLE
+- write port detail to db
+
+
+add the node instance detail into sql db?
+
+
+
 ##TODO
 
 * ~~open up connection to switch~~
@@ -17,6 +38,7 @@
 * ~~Switch from camelCase to snake_case~~
 * ~~Add functions to import all relevant device information into db schema required for "Service" creation and deletion (eg: populate nodeTable, portTable etc)~~
 * Fix up parameter parsing if/elif/else hell with argparse lib
+* Resolve conundrum with node object being distinct from Junos class (makes sense for future node types)
 * Confirm order of operations eg: 
     * Interface/CLI command
     * nodeAdd()

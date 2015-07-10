@@ -9,6 +9,14 @@ import constants
 from getpass import getpass
 from pprint import pprint
 
+class Node(node_ip_address, node_username, node_password, node_type):
+    def __init__(self, node_ip_address, node_username, node_password, node_type)
+        self.ip_address=node_ip_address
+        self.username=node_username
+        self.password=node_password
+        self.type=node_type
+    
+
 def open_db():
     try:
         db_connection = sqlite3.connect('lattice.sqlite')
@@ -83,7 +91,7 @@ def node_list():
         print node
     close_db(db_connection)
 
-def node_add(node_name, node_type, node_ip_address, location_id, node_status):
+def node_add(node):
     inet_Regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
     if inet_Regex.match(node_ip_address):
         db_connection = open_db()
@@ -180,8 +188,11 @@ def main(argv):
                 print "Printing node list..."
                 node_list()
             elif sys.argv[2]=='add':
+                # Open device, retrieve Serial Number and Model
                 print "Adding node " + sys.argv[3] + "..."
-                node_add('ex2200', 'junos_ex', sys.argv[3], 'NEXTDC B1', 'Up')
+	            with junosconnect.Junos(sys.argv[3], user=CONST_NODE_LOGIN, password=CONST_NODE_PASSWORD) as node:
+                    node_add(node)
+                # pull in interfaces
             elif sys.argv[2]=='delete':
                 print "Deleting node " + sys.argv[3] + "..."
                 node_delete(sys.argv[3])
