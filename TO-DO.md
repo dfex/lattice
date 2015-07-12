@@ -1,5 +1,3 @@
-Rough Sequence for a node add:
-
 node add 192.168.100.1 username password node-type
 
 capture above detail in node instance (Class)

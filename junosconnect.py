@@ -2,7 +2,7 @@ from jnpr.junos import Device
 from os import getenv
 
 
-class Junos(object):
+class Junos(Node):
     """Base class for Junos devices.
 
     :attr:`hostname`: router hostname

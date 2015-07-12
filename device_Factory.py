@@ -1,4 +1,5 @@
 import junosconnect
+import aristaconnect
 
 class Node(node_type, node_ip_address, node_username, node_password):
     """Node factory for device connections
@@ -16,6 +17,9 @@ class Node(node_type, node_ip_address, node_username, node_password):
         self.serial_number=''
         self.model=''
         self.host_name=''
-    
-        
+        self.status='UNINITIALISED'
+        #return eval(type + "()")
+        if self.type='junos_ex': return Junos()
+        if self.type='arista_eos': return Arista()
+        assert 0, 'Bad node type: ' + self.type
         
