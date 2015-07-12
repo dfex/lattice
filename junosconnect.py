@@ -61,7 +61,7 @@ class Junos(object):
         return table
 
     @property
-    def chassisInventory(self):
+    def chassis_table(self):
         """A chassis inventory
 
         :returns: Chassis Inventory
@@ -99,7 +99,7 @@ class Junos(object):
 
 
     def _connect(self):
-        """Connect to a device.
+        """Connect using NETCONF over SSH
 
         :returns: a connection to a Juniper Networks device.
         :rtype: ``Device``

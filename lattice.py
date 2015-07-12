@@ -4,18 +4,10 @@
 
 import re, sys, getopt
 import sqlite3
-import junosconnect
+import device_Factory
 import constants
 from getpass import getpass
 from pprint import pprint
-
-class Node(node_ip_address, node_username, node_password, node_type):
-    def __init__(self, node_ip_address, node_username, node_password, node_type)
-        self.ip_address=node_ip_address
-        self.username=node_username
-        self.password=node_password
-        self.type=node_type
-    
 
 def open_db():
     try:
