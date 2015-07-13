@@ -88,6 +88,10 @@ class Junos(Node):
         self.vpn = kwargs.get('vpn', 'default')
         self._connected = False
         self._connection = self._connect()
+        self.model=''
+        self.host_name=''
+        self.status='UNINITIALISED'
+
 
     def __enter__(self):
 		self._connection = self._connect()
