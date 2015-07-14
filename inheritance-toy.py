@@ -22,37 +22,43 @@ class Junos(Switch):
         Switch.describe(self)
 
 ## Something like:
-class Person:
-    def __init__(self):
-        self.name = None self.gender = None
-    
-    def getName(self): 
-        return self.name
+class Switch(object):
+    def connection(self):
+        print ("Not implemented in base class")
+    def describe(self):
+        print "My IP is: {}".format(self.ip_address)
+        print "Connect to me via {} with the username {} and password {}".format(self.connection_method, self.login, self.password)
+    def port_table(self):
+        print ("Not implemented in base class")
+    def chassis_table(self):
+        print ("Not implemented in base class")
+
+            
+class Junos(Switch):
+    def __init__(self, ip_address, login, password):
+        self.ip_address = ip_address
+        self.login = login
+        self.password = password
+        self.connection_method = "netconf/ssh"
         
-    def getGender(self):
-        return self.gender
+
+class Arista(Switch):
+    def __init__(self, ip_address, login, password):
+        self.ip_address = ip_address
+        self.login = login
+        self.password = password
+        self.connection_method = "eAPI/REST"        
 
 
-class Male(Person):
-    def __init__(self, name):
-        print "Hello Mr." + name
-
-
-class Female(Person):
-    def __init__(self, name):
-        print "Hello Miss." + name
-
-
-class Factory:
-    def getPerson(self, name, gender):
-        if gender == 'M':
-            return Male(name)
-        if gender == 'F':
-            return Female(name)
-￼￼
-if __name__ == '__main__': 
-    factory = Factory()
-    person = factory.getPerson("Chetan", "M")
+class NodeFactory:
+    def createSwitch(self, switch_type, ip_address, login, password):
+        if switch_type == 'junos-ex':
+            return Junos(ip_address, login, password)
+        if switch_type == 'arista-eos':
+            return Arista(ip_address, login, password)
+         
+factory = NodeFactory()
+lab_box = factory.createSwitch("junos-ex", "192.168.1.1", "ben", "secret")
     
 # or even http://python-3-patterns-idioms-test.readthedocs.org/en/latest/Factory.html
 # http://programmers.stackexchange.com/questions/166699/python-factory-function-best-practices

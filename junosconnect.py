@@ -2,14 +2,12 @@ from jnpr.junos import Device
 from os import getenv
 
 
-class Junos(Node):
+class Junos_Device(Node):
     """Base class for Junos devices.
 
     :attr:`hostname`: router hostname
     :attr:`user`: user for logging into `hostname`
     :attr:`password`: password for logging into `hostname`
-    :attr:`timeout`: time to wait for a response
-    :attr:`connection`: connection to `hostname`
     """
 
     @property
@@ -18,26 +16,6 @@ class Junos(Node):
         returns the connection
         """
         return self._connection
-
-    @property
-    def arp_table(self):
-        """A list of ARP entries.
-
-        :returns: ARP entries
-        :rtype: list
-        """
-        table = []
-        old_table = self.connection.rpc.get_arp_table_information(vpn=self.vpn)
-        for old_entry in old_table:
-            if old_entry.tag != 'arp-table-entry':
-				continue
-            entry = dict(ip_address=old_entry.findtext('ip-address').strip(),
-                         interface=old_entry.findtext('interface-name').strip(),
-                         hostname=self.hostname.strip(),
-                         vpn=self.vpn,
-                         mac_address=old_entry.findtext('mac-address').strip())
-            table.append(entry)
-        return table
 
     @property
     def port_table(self):
@@ -82,15 +60,21 @@ class Junos(Node):
 
     def __init__(self, *args, **kwargs):
         self.hostname = args[0] if len(args) else kwargs.get('host')
-        self.user = kwargs.get('user', getenv('USER'))
+        self.user = kwargs.get('username')
         self.password = kwargs.get('password')
         self.timeout = kwargs.get('timeout')
-        self.vpn = kwargs.get('vpn', 'default')
         self._connected = False
         self._connection = self._connect()
         self.model=''
         self.host_name=''
         self.status='UNINITIALISED'
+
+#class Junos(Switch):
+#    def __init__(self, ip_address, login, password):
+#        self.ip_address = ip_address
+#        self.login = login
+#        self.password = password
+#        self.connection_method = "netconf/ssh"
 
 
     def __enter__(self):
