@@ -64,8 +64,10 @@ class Arista_Device(Node):
         :rtype: ``Device``
         """
         if self.password=='':
+        	pass
         	# IMPLEMENT ME!
         else:
+            pass
         	# IMPLEMENT ME!
         # MORE STUFF!
         return dev
