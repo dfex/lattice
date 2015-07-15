@@ -1,6 +1,7 @@
+from switch import Switch
 import requests
 
-class Arista_Device(Node):
+class Arista_Device(Switch):
     """Arista devices class
 
     :attr:`hostname`: router hostname

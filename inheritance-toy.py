@@ -21,7 +21,7 @@ class Junos(Switch):
     def describe(self):   
         Switch.describe(self)
 
-## Something like:
+## This version is a better starting point:
 class Switch(object):
     def connection(self):
         print ("Not implemented in base class")

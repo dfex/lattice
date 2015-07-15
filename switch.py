@@ -5,8 +5,10 @@ class Switch(object):
         print ("Not implemented in base class")
     def describe(self):
         print "My IP is: {}".format(self.ip_address)
-        print "Connect to me via {} with the username {} and password {}".format(self.connection_method, self.login, self.password)
+        print "Connect to me via {} with the username {} and password {}".format(self.connection_method, self.user_name, self.password)
     def port_table(self):
         print ("Not implemented in base class")
     def chassis_table(self):
         print ("Not implemented in base class")
+
+         

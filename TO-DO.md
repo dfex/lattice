@@ -36,7 +36,8 @@ add the node instance detail into sql db?
 * ~~Switch from camelCase to snake_case~~
 * ~~Add functions to import all relevant device information into db schema required for "Service" creation and deletion (eg: populate nodeTable, portTable etc)~~
 * Fix up parameter parsing if/elif/else hell with argparse lib
-* Resolve conundrum with node object being distinct from Junos class (makes sense for future node types)
+* ~~Resolve conundrum with node object being distinct from Junos class (makes sense for future node types)~~
+* ~~Resolve issue with chassis_table "list" object~~
 * Confirm order of operations eg: 
     * Interface/CLI command
     * nodeAdd()
