@@ -4,7 +4,7 @@
 
 import re, sys, getopt
 import sqlite3
-import device_Factory
+from device_Factory import NodeFactory
 import constants
 from getpass import getpass
 from pprint import pprint
@@ -180,10 +180,11 @@ def main(argv):
                 print "Printing node list..."
                 node_list()
             elif sys.argv[2]=='add':
+                # node add <type> <ip_address> <username> <password>
                 # Open device, retrieve Serial Number and Model
-                print "Adding node " + sys.argv[3] + "..."
-	            with junosconnect.Junos(sys.argv[3], user=CONST_NODE_LOGIN, password=CONST_NODE_PASSWORD) as node:
-                    node_add(node)
+                print "Adding node " + sys.argv[4] + "..."
+                switchFactory = NodeFactory()
+                new_switch = switchFactory.create_switch(sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
                 # pull in interfaces
             elif sys.argv[2]=='delete':
                 print "Deleting node " + sys.argv[3] + "..."
