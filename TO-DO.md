@@ -49,6 +49,7 @@ add the node instance detail into sql db?
     * ~~Add port information to portTable~~
     * ~~Close db connection (inside business logic, or part of controller?~~
 * ~~Explore moving to structs/objects rather than passing individual variables - eg: when reading from a node return a populated node object eg: node.name, node.ipAddress etc., then just pass the entire node object to addnode() for writing to db~~
+* ~~Update device interactions such that they could operate in a multi-vendor environment (using Node type field to distinguish)~~
 * Fix up parameter parsing if/elif/else hell with argparse lib
 * Add functions to write out from db to device configuration via j2 templates (? or just the required RPC calls?)
 * Re-write lattice.py so that node addition handles port addition in same context (so ports can be tied back to node in db)
@@ -66,10 +67,9 @@ add the node instance detail into sql db?
 * Username/Password storage.  SSH Keys for Junos - REST on eOS?
 
 ##TOFIX:
-* Will need to adjust chassisInventory for multi-device/multiRE clusters or VCs down the track
+* ~~Will need to adjust chassisInventory for multi-device/multiRE clusters or VCs down the track~~
 
 ##Phase 2 
-* Update device interactions such that they could operate in a multi-vendor environment (using Node type field to distinguish)
 * Test-driven Web app in Django or lighter weight - selenium integration
 * Add a "flare" table so that Customer can have an icon associated with their connection
 * Add custom logic for certain end-points (eg: AWS, Azure or GCE login credentials)
