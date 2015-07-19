@@ -15,8 +15,12 @@ Use the following format for code branches:
 
 Follow with issue number from Github repo, then brief description of purpose eg:
 
+
 ```feat/12/add-restful-hooks```
+
 
 Create and checkout from the CLI using:
 
+
 ```git checkout -b feat/12/add-restful-hooks```
+
