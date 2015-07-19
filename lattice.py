@@ -109,6 +109,14 @@ def node_delete(node_ip_address):
         sys.stdout.write("node_delete() ERROR: Invalid IP Address")
         sys.exit(1)
 
+def ports_add(ports_table):
+    db_connection = open_db()
+    cur = db_connection.cursor()
+    for port in ports_table:
+        cur.execute("INSERT INTO PortTable(PortName, PortStatus, PortSpeed, CustomerID, NodeID) VALUES(?, ?, ?, ?, ?)",(port['name'], port['oper_status'], port['speed'], 'EighthLayer', 'somenode'))
+    db_connection.commit()
+    close_db(db_connection)
+
 def sub_interface_list():
     db_connection = open_db()
     cur = db_connection.cursor()
@@ -188,7 +196,8 @@ def main(argv):
                 new_switch = switchFactory.create_switch(sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
                 # pass populated switch object to add_switch for importing into db
                 node_add(new_switch)
-                # pull in interfaces
+                ports_table = new_switch.port_table
+                ports_add(ports_table)
             elif sys.argv[2]=='delete':
                 print "Deleting node " + sys.argv[3] + "..."
                 node_delete(sys.argv[3])
@@ -237,6 +246,7 @@ def main(argv):
     else:
         sys.stdout.write("Error: Missing parameter\n\n")
         usage()
+
     #case (sys.argv[1]):
     #   "reinit":
     # Handle parameter
