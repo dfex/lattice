@@ -62,6 +62,7 @@ add the node instance detail into sql db?
 	* an 802.1ad double-tagged VLAN with one-to-one mapping of individual CVLANs
 * Build lattice service types as either "Point-to-Point" or "Multipoint" (easy icon for recognition)
 * Add RESTful API hooks for functions
+* Username/Password storage.  SSH Keys for Junos - REST on eOS?
 
 ##TOFIX:
 * Will need to adjust chassisInventory for multi-device/multiRE clusters or VCs down the track
