@@ -46,9 +46,9 @@ add the node instance detail into sql db?
     * ~~Pull down node information~~
     * ~~Open db (inside function, or open and pass?)~~
     * ~~Add node information to nodeTable (open and close db, or pass db connection?)~~
-    * Pull down port information
-    * Add port information to portTable
-    * Close db connection (inside business logic, or part of controller?
+    * ~~Pull down port information~~
+    * ~~Add port information to portTable~~
+    * ~~Close db connection (inside business logic, or part of controller?~~
 * Add functions to write out from db to device configuration via j2 templates (? or just the required RPC calls?)
 * Explore moving to structs/objects rather than passing individual variables - eg: when reading from a node return a populated node object eg: node.name, node.ipAddress etc., then just pass the entire node object to addnode() for writing to db
 * Re-visit db schema and adjust functions to match - eg: referencing via PKs (IDs), only required/relevant fields for functions, and map to end-user operational flow (more tables, rigour around NOT NULL requirements)
