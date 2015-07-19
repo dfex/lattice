@@ -39,13 +39,13 @@ add the node instance detail into sql db?
 * ~~Resolve conundrum with node object being distinct from Junos class (makes sense for future node types)~~
 * ~~Resolve issue with chassis_table "list" object~~
 * Update lattice.py to work with new object hierarchy
-* Confirm order of operations eg: 
-    * Interface/CLI command
-    * nodeAdd()
-    * Attempt to connect to device
-    * Pull down node information
-    * Open db (inside function, or open and pass?)
-    * Add node information to nodeTable (open and close db, or pass db connection?)
+* ~~Confirm order of operations eg:~~ 
+    * ~~Interface/CLI command~~
+    * ~~nodeAdd()~~
+    * ~~Attempt to connect to device~~
+    * ~~Pull down node information~~
+    * ~~Open db (inside function, or open and pass?)~~
+    * ~~Add node information to nodeTable (open and close db, or pass db connection?)~~
     * Pull down port information
     * Add port information to portTable
     * Close db connection (inside business logic, or part of controller?
