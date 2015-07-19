@@ -83,9 +83,9 @@ def node_list():
         print node
     close_db(db_connection)
 
-def node_add(node):
+def node_add(switch):
     inet_Regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
-    if inet_Regex.match(node_ip_address):
+    if inet_Regex.match(switch.ip_address):
         db_connection = open_db()
         cur = db_connection.cursor()
         cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus) VALUES(?, ?, ?, ?, ?)",(node_name, node_type, node_ip_address, location_id, node_status))
@@ -184,7 +184,10 @@ def main(argv):
                 # Open device, retrieve Serial Number and Model
                 print "Adding node " + sys.argv[4] + "..."
                 switchFactory = NodeFactory()
+                # connect to device and populate new_switch object
                 new_switch = switchFactory.create_switch(sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+                # pass populated switch object to add_switch for importing into db
+                node_add(new_switch)
                 # pull in interfaces
             elif sys.argv[2]=='delete':
                 print "Deleting node " + sys.argv[3] + "..."

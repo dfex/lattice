@@ -28,7 +28,7 @@ class Arista_Device(Switch):
         return port_table
 
     @property
-    def chassis_table(self):
+    def switch_detail(self):
         """A chassis inventory
 
         :returns: Chassis Inventory
@@ -46,9 +46,12 @@ class Arista_Device(Switch):
         self.timeout = kwargs.get('timeout')
         self._connected = False
         self._connection = self._connect()
+        self.switch_type = 'arista-eos'
         self.model=''
         self.host_name=''
         self.status='UNINITIALISED'
+        self.connection_method='eAPI via REST'     
+
 
     def __enter__(self):
 		self._connection = self._connect()

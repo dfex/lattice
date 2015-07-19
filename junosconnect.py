@@ -38,24 +38,14 @@ class Junos_Device(Switch):
 			port_table.append(entry)
         return port_table
 
-    @property
-    def chassis_table(self):
-        """A chassis inventory
-
-        :returns: Chassis Inventory
-        :rtype: list
+    def switch_detail(self):
+        """Populates information on the device
         """
         sys_info_table = self.connection.rpc.get_software_information()
-        host_name = sys_info_table.findtext('host-name')
-        chassis_table = []
-        old_table = self.connection.rpc.get_chassis_inventory()
-        for old_entry in old_table:
-			entry = dict(serial_number=old_entry.findtext('serial-number').strip(),
-			             model=old_entry.findtext('description').strip(),
-			             hostname=host_name)
-			chassis_table.append(entry)
-        return chassis_table
-
+        self.host_name = sys_info_table.findtext('host-name')
+        hw_info_table = self.connection.rpc.get_chassis_inventory()
+        self.serial_number = hw_info_table.findtext('chassis/serial-number')
+        self.model = hw_info_table.findtext('chassis/description')
 
     def __init__(self, ip_address, user_name, password):
         self.ip_address = ip_address
@@ -63,10 +53,13 @@ class Junos_Device(Switch):
         self.password = password
         self._connected = False
         self._connection = self._connect()
+        self.switch_type = 'junos-ex'
         self.model=''
         self.host_name=''
         self.status='UNINITIALISED'
-        self.connection_method='NETCONF over ssh'       
+        self.connection_method='NETCONF over ssh'
+        self.switch_detail()
+        
 #class Junos(Switch):
 #    def __init__(self, ip_address, login, password):
 #        self.ip_address = ip_address
