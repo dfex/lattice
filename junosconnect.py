@@ -49,6 +49,12 @@ class Junos_Device(Switch):
         self.serial_number = hw_info_table.findtext('chassis/serial-number')
         self.model = hw_info_table.findtext('chassis/description')
 
+    def configure_port(self, port_name, port_description):
+        """Sets the description of a given port
+        """
+        rpc_call = '<rpc> <edit-config> <target> <candidate/> <target> <config> <configuration> <interfaces> <interface> <name>' + port_name + '</name> <description>' + port_description + '</description> </interface> </interfaces> </configuration> </config> </edit-config> </rpc>'
+        self.connection.rpc.
+        
     def __init__(self, ip_address, user_name, password):
         self.ip_address = ip_address
         self.user_name = user_name
@@ -60,6 +66,7 @@ class Junos_Device(Switch):
         self.host_name=''
         self.status='UNINITIALISED'
         self.connection_method='NETCONF over ssh'
+        self.configuration = Config(self)
         self.switch_detail()
         
 #class Junos(Switch):

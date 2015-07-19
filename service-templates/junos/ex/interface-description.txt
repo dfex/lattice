@@ -1,0 +1,17 @@
+<rpc>
+    <edit-config>
+        <target>
+            <candidate/>
+        <target>
+        <config>
+            <configuration>
+                <interfaces>
+                    <interface>
+                        <name>ge-0/0/0</name> 
+                        <description>Test</description>
+                    </interface>
+                </interfaces>
+            </configuration>
+        </config>
+    </edit-config>
+</rpc>
