@@ -50,8 +50,8 @@ add the node instance detail into sql db?
     * ~~Close db connection (inside business logic, or part of controller?~~
 * ~~Explore moving to structs/objects rather than passing individual variables - eg: when reading from a node return a populated node object eg: node.name, node.ipAddress etc., then just pass the entire node object to addnode() for writing to db~~
 * ~~Update device interactions such that they could operate in a multi-vendor environment (using Node type field to distinguish)~~
-* Fix up parameter parsing if/elif/else hell with argparse lib
 * Add functions to write out from db to device configuration via j2 templates (? or just the required RPC calls?)
+* Fix up parameter parsing if/elif/else hell with argparse lib
 * Re-write lattice.py so that node addition handles port addition in same context (so ports can be tied back to node in db)
 * Re-visit db schema and adjust functions to match - eg: referencing via PKs (IDs), only required/relevant fields for functions, and map to end-user operational flow (more tables, rigour around NOT NULL requirements)
 * Break out service configuration from definition/type
