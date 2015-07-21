@@ -1,5 +1,6 @@
 from switch import Switch
 from jnpr.junos import Device
+from jnpr.junos.utils.config import Config
 from os import getenv
 
 class Junos_Device(Switch):
@@ -52,8 +53,11 @@ class Junos_Device(Switch):
     def configure_port(self, port_name, port_description):
         """Sets the description of a given port
         """
-        rpc_call = '<rpc> <edit-config> <target> <candidate/> <target> <config> <configuration> <interfaces> <interface> <name>' + port_name + '</name> <description>' + port_description + '</description> </interface> </interfaces> </configuration> </config> </edit-config> </rpc>'
-        self.connection.rpc.
+        rpc_call = '<configuration> <interfaces> <interface> <name>' + port_name + '</name> <description>' + port_description + '</description> </interface> </interfaces> </configuration>'
+        self.connection.bind(cu=Config)
+        self.connection.cu
+        self.connection.cu.load(rpc_call, format="xml")  
+        self.connection.cu.commit()
         
     def __init__(self, ip_address, user_name, password):
         self.ip_address = ip_address
