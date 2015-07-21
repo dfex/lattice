@@ -58,6 +58,16 @@ class Junos_Device(Switch):
         self.connection.cu
         self.connection.cu.load(rpc_call, format="xml")  
         self.connection.cu.commit()
+
+    def configure_svlan(self, vlan_id, vlan_name, vlan_description):
+        """Create Service VLAN on switch
+        """
+        # Fix RPC call
+        rpc_call = '<configuration> <interfaces> <interface> <name>' + port_name + '</name> <description>' + port_description + '</description> </interface> </interfaces> </configuration>'
+        self.connection.bind(cu=Config)
+        self.connection.cu
+        self.connection.cu.load(rpc_call, format="xml")  
+        self.connection.cu.commit()       
         
     def __init__(self, ip_address, user_name, password):
         self.ip_address = ip_address

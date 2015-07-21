@@ -1,11 +1,131 @@
+# J2
+
 vlans {
-    {%- vlan-name %} {
-        description "{%- vlan-description %}"
-        vlan-id {%- vlan-ctag %}
-        dot1q-tunneling {
+    {%- vlan_name %} {
+        description "{%- vlan_description %}"
+        vlan-id {%- vlan_stag %}
+        dot1q_tunneling {
             layer2-protocol-tunneling {
                 all;
             }
         }
     }
 }
+
+
+# XML
+<configuration>
+    <vlans>
+        <vlan>
+            <name>{%- vlan_name %}</name>
+            <description>{%- vlan_description %}
+            <vlan-id>{%- vlan_stag %}
+            <dot1q-tunneling>
+            </dot1q-tunneling>
+        </vlan>
+    </vlans>
+</configuration>
+
+# XML Interface
+    <configuration>
+            <interfaces>
+                <interface>
+                    <name>ge-0/0/10</name>
+                    <unit>
+                        <name>0</name>
+                        <family>
+                            <ethernet-switching>
+                                <port-mode>access</port-mode>
+                            </ethernet-switching>
+                        </family>
+                    </unit>
+                </interface>
+            </interfaces>
+    </configuration>
+
+# 
+
+# Junos VLANs
+
+v30-TRANSPORT {
+    vlan-id 30;
+    interface {
+        ge-0/0/10.0 {
+            mapping {
+                10 {
+                    push;
+                }
+            }
+        }
+    }
+    dot1q-tunneling {
+        layer2-protocol-tunneling {
+            all;
+        }
+    }                                   
+}
+v31-TRANSPORT {
+    vlan-id 31;
+    interface {
+        ge-0/0/10.0 {
+            mapping {
+                11 {
+                    push;
+                }
+            }
+        }
+    }
+    dot1q-tunneling {
+        layer2-protocol-tunneling {
+            all;
+        }
+    }
+}
+
+
+#XML VLANs
+
+    <configuration junos:changed-seconds="1427283643" junos:changed-localtime="2015-03-25 11:40:43 UTC">
+            <vlans>
+                <vlan>
+                    <name>v30-TRANSPORT</name>
+                    <vlan-id>30</vlan-id>
+                    <interface>
+                        <name>ge-0/0/10.0</name>
+                        <mapping>
+                            <mapping-data>
+                                <name>10</name>
+                                <push/>
+                            </mapping-data>
+                        </mapping>      
+                    </interface>
+                    <dot1q-tunneling>
+                        <layer2-protocol-tunneling>
+                            <l2pt-protocol>
+                                <name>all</name>
+                            </l2pt-protocol>
+                        </layer2-protocol-tunneling>
+                    </dot1q-tunneling>
+                </vlan>
+                <vlan>
+                    <name>v31-TRANSPORT</name>
+                    <vlan-id>31</vlan-id>
+                    <interface>
+                        <name>ge-0/0/10.0</name>
+                        <mapping>
+                            <mapping-data>
+                                <name>11</name>
+                                <push/>
+                            </mapping-data>
+                        </mapping>
+                    </interface>
+                    <dot1q-tunneling>
+                        <layer2-protocol-tunneling>
+                            <l2pt-protocol>
+                                <name>all</name>
+                            </l2pt-protocol>
+                        </layer2-protocol-tunneling>
+                    </dot1q-tunneling>
+                </vlan>
+            </vlans>
+    </configuration>
