@@ -51,19 +51,18 @@ class Junos_Device(Switch):
         self.model = hw_info_table.findtext('chassis/description')
 
     def create_port(self, port_name, port_description):
-        """Sets the description of a given port
+        """Configures port_name as an access port with port_description configured on IFD
         """
-        rpc_call = '<configuration> <interfaces> <interface> <name>' + port_name + '</name> <description>' + port_description + '</description> </interface> </interfaces> </configuration>'
-        self.connection.bind(cu=Config)
-        self.connection.cu
-        self.connection.cu.load(rpc_call, format="xml")  
-        self.connection.cu.commit()
+        port_vars={}
+        port_vars['port_name'] = port_name
+        port_vars['port_description'] = port_description
+        cu = Config(self.connection)
+        cu.load(template_path='service-templates/junos/ex/dot1ad-port.conf', template_vars=port_vars, merge=True)  
+        cu.commit()       
 
     def create_svlan(self, vlan_id, vlan_name, vlan_description):
         """Create Service VLAN on switch
         """
-        # Fix RPC call
-        # rpc_call = '<configuration> <interfaces> <interface> <name>' + port_name + '</name> <description>' + port_description + '</description> </interface> </interfaces> </configuration>'
         svlan_vars={}
         svlan_vars['vlan_stag'] = vlan_id
         svlan_vars['vlan_name'] = vlan_name
@@ -71,6 +70,18 @@ class Junos_Device(Switch):
         cu = Config(self.connection)
         cu.load(template_path='service-templates/junos/ex/dot1ad-vlan.conf', template_vars=svlan_vars, merge=True)  
         cu.commit()       
+    
+    def bind_service(self, cvlan_id, svlan_name, port_name):
+        """Binds cvlan_id from port_name to svlan_name (one-to-one bundling)
+        """
+        bind_service_vars={}
+        bind_service_vars['cvlan_id'] = cvlan_id
+        bind_service_vars['svlan_name'] = svlan_name
+        bind_service_vars['port_name'] = port_name
+        cu = Config(self.connection)
+        cu.load(template_path='service-templates/junos/ex/dot1ad-service.conf', template_vars=svlan_vars, merge=True)  
+        cu.commit()       
+        
         
     def __init__(self, ip_address, user_name, password):
         self.ip_address = ip_address
