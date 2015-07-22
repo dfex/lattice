@@ -63,11 +63,14 @@ class Junos_Device(Switch):
         """Create Service VLAN on switch
         """
         # Fix RPC call
-        rpc_call = '<configuration> <interfaces> <interface> <name>' + port_name + '</name> <description>' + port_description + '</description> </interface> </interfaces> </configuration>'
-        self.connection.bind(cu=Config)
-        self.connection.cu
-        self.connection.cu.load(rpc_call, format="xml")  
-        self.connection.cu.commit()       
+        # rpc_call = '<configuration> <interfaces> <interface> <name>' + port_name + '</name> <description>' + port_description + '</description> </interface> </interfaces> </configuration>'
+        svlan_vars={}
+        svlan_vars['vlan_stag'] = vlan_id
+        svlan_vars['vlan_name'] = vlan_name
+        svlan_vars['vlan_description'] = vlan_description
+        cu = Config(self.connection)
+        cu.load(template_path='service-templates/junos/ex/dot1ad-vlan.conf', template_vars=svlan_vars, merge=True)  
+        cu.commit()       
         
     def __init__(self, ip_address, user_name, password):
         self.ip_address = ip_address
