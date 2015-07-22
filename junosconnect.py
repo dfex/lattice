@@ -50,7 +50,7 @@ class Junos_Device(Switch):
         self.serial_number = hw_info_table.findtext('chassis/serial-number')
         self.model = hw_info_table.findtext('chassis/description')
 
-    def configure_port(self, port_name, port_description):
+    def create_port(self, port_name, port_description):
         """Sets the description of a given port
         """
         rpc_call = '<configuration> <interfaces> <interface> <name>' + port_name + '</name> <description>' + port_description + '</description> </interface> </interfaces> </configuration>'
@@ -59,7 +59,7 @@ class Junos_Device(Switch):
         self.connection.cu.load(rpc_call, format="xml")  
         self.connection.cu.commit()
 
-    def configure_svlan(self, vlan_id, vlan_name, vlan_description):
+    def create_svlan(self, vlan_id, vlan_name, vlan_description):
         """Create Service VLAN on switch
         """
         # Fix RPC call
