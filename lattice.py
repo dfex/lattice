@@ -110,11 +110,11 @@ def node_delete(node_ip_address):
         sys.stdout.write("node_delete() ERROR: Invalid IP Address")
         sys.exit(1)
 
-def ports_add(ports_table):
+def ports_add(switch, ports_table):
     db_connection = open_db()
     cur = db_connection.cursor()
     for port in ports_table:
-        cur.execute("INSERT INTO PortTable(PortName, PortStatus, PortSpeed, CustomerID, NodeID) VALUES(?, ?, ?, ?, ?)",(port['name'], port['oper_status'], port['speed'], 'EighthLayer', 'somenode'))
+        cur.execute("INSERT INTO PortTable(PortName, PortStatus, PortSpeed, CustomerID, NodeID) VALUES(?, ?, ?, ?, ?)",(port['name'], port['oper_status'], port['speed'], 'lattice', switch.host_name))
     db_connection.commit()
     close_db(db_connection)
 
@@ -198,7 +198,7 @@ def main(argv):
                 # pass populated switch object to add_switch for importing into db
                 node_add(new_switch)
                 ports_table = new_switch.port_table
-                ports_add(ports_table)
+                ports_add(new_switch, ports_table)
             elif sys.argv[2]=='delete':
                 print "Deleting node " + sys.argv[3] + "..."
                 node_delete(sys.argv[3])

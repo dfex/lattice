@@ -44,8 +44,13 @@ class Junos_Device(Switch):
         """
         sys_info_table = self.connection.rpc.get_software_information()
         # For non-VC capable devices eg: EX3200
-        # self.host_name = sys_info_table.findtext('host-name')
-        self.host_name = sys_info_table.findtext('multi-routing-engine-item/software-information/host-name')
+        #self.host_name = sys_info_table.findtext('host-name')
+        #self.host_name = sys_info_table.findtext('multi-routing-engine-item/software-information/host-name')
+        exstyle_hostname = sys_info_table.findtext('multi-routing-engine-item/software-information/host-name')
+        if exstyle_hostname:
+            self.host_name = exstyle_hostname
+        else: #single RE hostname style
+            self.host_name = sys_info_table.findtext('host-name')
         hw_info_table = self.connection.rpc.get_chassis_inventory()
         self.serial_number = hw_info_table.findtext('chassis/serial-number')
         self.model = hw_info_table.findtext('chassis/description')
