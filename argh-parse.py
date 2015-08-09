@@ -4,12 +4,15 @@
 import argh
 
 def node():
+    "Perfoms operations on a node"
     pass
 
 def service():
+    "Allows service definition, attachment and removal"
     pass
 
 def reinit():
+    "Re-initialises the lattice db"
     pass
 
 parser = argh.ArghParser()
