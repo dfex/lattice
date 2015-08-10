@@ -4,11 +4,11 @@
 import argh
 import sys
 
-def add(args):
+def add(ip_address, node_type, username, password, ):
     "Adds a new node"
     pass
 
-def delete(args):
+def delete(ip_address):
     "Deletes a node"
     pass
 
@@ -16,15 +16,15 @@ def list():
     "Returns a list of nodes"
     pass
 
-def create():
+def create(type, id):
     "Creates a service definition"
     pass
 
-def attach():
+def attach(serviceid, port):
     "Attaches a service to a port"
     pass
 
-def detach():
+def detach(serviceid, port):
     "Detaches a service from a port"
 
 def reinit():
@@ -32,8 +32,21 @@ def reinit():
     pass
 
 parser = argh.ArghParser()
-parser.add_commands([add, delete, list], namespace='node', title='Node Operations')
-parser.add_commands([create, attach, detach], namespace='service', title='Service Operations')
+parser.add_commands([add, delete, list], 
+                    namespace='node', 
+                    namespace_kwargs={
+                        'title': 'Node Operations', 
+                        'description': 'Node Operations ', 
+                        'help': 'Node Operations'
+                    })
+parser.add_commands([create, attach, detach], 
+                    namespace='service', 
+                    namespace_kwargs={
+                        'title': 'Service Operations', 
+                        'description': 'Service Operations', 
+                        'help': 'Service Operations'
+                    })
+                    
 parser.add_commands([reinit])
 
 
