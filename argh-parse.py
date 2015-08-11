@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # Experimental parser
 
-import argh
+from argh import named, ArghParser, expects_obj
 import sys
 
 def add(ip_address, node_type, username, password, ):
@@ -24,14 +24,16 @@ def attach(serviceid, port):
     "Attaches a service to a port"
     pass
 
+@expects_obj
 def detach(serviceid, port):
     "Detaches a service from a port"
 
-def reinit():
+@named('reinit')
+def reinit_db():
     "Re-initialises the lattice db"
     pass
 
-parser = argh.ArghParser()
+parser = ArghParser()
 parser.add_commands([add, delete, list], 
                     namespace='node', 
                     namespace_kwargs={

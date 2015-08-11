@@ -4,6 +4,7 @@
 
 import re, sys, getopt
 import sqlite3
+from argh import named, ArghParser, expects_obj
 from device_Factory import NodeFactory
 import constants
 from getpass import getpass
@@ -21,6 +22,7 @@ def open_db():
 def close_db(db_connection):
     db_connection.close()
 
+@named('reinit')
 def reinit_db():
     confirmation = raw_input("Re-initialise lattice db - are you sure? (y/n)")
     if confirmation.upper() == 'Y':
@@ -58,7 +60,6 @@ def reinit_db():
         print "DB closed"
     else:
         print "Confirmation cancelled"
-        return 0
 
 def usage():
     sys.stdout.write("Usage: lattice reinit\n")
@@ -75,6 +76,7 @@ def usage():
     sys.stdout.write("Usage: lattice service list\n")
     sys.stdout.write("\n")
 
+@named('list')
 def node_list():
     db_connection = open_db()
     cur = db_connection.cursor()
@@ -84,6 +86,7 @@ def node_list():
         print node
     close_db(db_connection)
 
+@named('add')
 def node_add(switch):
     inet_Regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
     if inet_Regex.match(switch.ip_address):
@@ -96,6 +99,7 @@ def node_add(switch):
 	    sys.stdout.write("node_add() ERROR: Invalid IP Address")
 	    sys.exit(1)
 
+@named('delete')
 def node_delete(node_ip_address):
     # Probably should delete by Primary Key, even though nodeIPAddress will be unique
     inet_regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$")
@@ -118,6 +122,7 @@ def ports_add(switch, ports_table):
     db_connection.commit()
     close_db(db_connection)
 
+@named('list')
 def sub_interface_list():
     db_connection = open_db()
     cur = db_connection.cursor()
@@ -127,6 +132,7 @@ def sub_interface_list():
         print sub_interface
     close_db(db_connection)
 
+@named('create')
 def sub_interface_create(sub_interface_unit, sub_interface_vlan_id, service_id, sub_interface_status, port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
@@ -134,6 +140,7 @@ def sub_interface_create(sub_interface_unit, sub_interface_vlan_id, service_id, 
     db_connection.commit()
     close_db(db_connection)
 
+@named('delete')
 def sub_interface_delete(sub_interface_unit, port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
@@ -141,6 +148,7 @@ def sub_interface_delete(sub_interface_unit, port_id):
     db_connection.commit()
     close_db(db_connection)
 
+@named('create')
 def service_create(service_name, service_type):
     db_connection = open_db()
     cur = db_connection.cursor()
@@ -148,6 +156,7 @@ def service_create(service_name, service_type):
     db_connection.commit()
     close_db(db_connection)
 
+@named('delete')
 def service_delete(service_name):
     db_connection = open_db()
     cur = db_connection.cursor()
@@ -155,6 +164,7 @@ def service_delete(service_name):
     db_connection.commit()
     close_db(db_connection)
 
+@named('list')
 def service_list():
     db_connection = open_db()
     cur = db_connection.cursor()
@@ -164,6 +174,7 @@ def service_list():
         print service
     close_db(db_connection)
 
+@named('attach')
 def service_attach(service_id, sub_interface_id):
     db_connection = open_db()
     cur = db_connection.cursor()
@@ -171,82 +182,118 @@ def service_attach(service_id, sub_interface_id):
     close_db(db_connection)
     db_connection.commit()
 
-def main(argv):
-    sys.stdout.write("lattice\n\n")
-    lattice_Function=''
-    if len(sys.argv) <= 1:
-        usage()
-        exit(1)
-    else:
-        lattice_function = sys.argv[1]
+@named('detach')
+def service_detach(service_id):
+    db_connection = open_db()
+    cur = db_connection.cursor()
+    cur.execute("DELETE FROM ServiceTable WHERE ServiceID = ?",(service_id))
+    close_db(db_connection)
+    db_connection.commit()
+
+
+#def main(argv):
+#    sys.stdout.write("lattice\n\n")
+#    lattice_Function=''
+#    if len(sys.argv) <= 1:
+#        usage()
+#        exit(1)
+#    else:
+#        lattice_function = sys.argv[1]
     # Okay, this is getting ugly - fix up with argparse library or similar
     # Think through the grammar so that it makes sense when the REST API is added
-    if lattice_function == 'reinit':
-        reinit_db()
-    elif lattice_function == 'node':
-        if len(sys.argv) >= 3:
-            if sys.argv[2]=='list':
-                print "Printing node list..."
-                node_list()
-            elif sys.argv[2]=='add':
-                # node add <type> <ip_address> <username> <password>
-                # Open device, retrieve Serial Number and Model
-                print "Adding node " + sys.argv[4] + "..."
-                switchFactory = NodeFactory()
-                # connect to device and populate new_switch object
-                new_switch = switchFactory.create_switch(sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
-                # pass populated switch object to add_switch for importing into db
-                node_add(new_switch)
-                ports_table = new_switch.port_table
-                ports_add(new_switch, ports_table)
-            elif sys.argv[2]=='delete':
-                print "Deleting node " + sys.argv[3] + "..."
-                node_delete(sys.argv[3])
-            else:
-                print "Error: '" + sys.argv[2] + "' is an unknown node parameter\n"
-                usage()
-        else:
-            sys.stdout.write("Error: incorrect node parameters\n\n")
-            usage()
-    elif lattice_function == 'subinterface':
-        if len(sys.argv) >= 3:
-            if sys.argv[2]=='list':
-                print "Printing subinterface list..."
-                sub_interface_list()
-            elif sys.argv[2]=='create':
-                print "Creating subinterface " + sys.argv[3] + "..."
-                sub_interface_create(sys.argv[3], sys.argv[3], 'sid'+sys.argv[3], 'Active', 'ge-0/0/0')
-            elif sys.argv[2]=='delete':
-                print "Deleting subinterface " + sys.argv[3] + "..."
-                sub_interface_delete(sys.argv[3], 'ge-0/0/0')
-            elif sys.argv[2]=='attach':
-                print "Attaching subinterface " + sys.argv[3] + " to node " + sys.argv[4]
-            else:
-                print "Error: '" + sys.argv[2] + "' is an unknown service parameter\n"
-                usage()
-        else:
-            sys.stdout.write("Error: incorrect service parameters\n\n")
-            usage()
-    elif lattice_function == 'service':
-        if len(sys.argv) >= 3:
-            if sys.argv[2]=='list':
-                print "Printing service list..." 
-                service_list()
-            elif sys.argv[2]=='create':
-                print "Creating service " + sys.argv[3] + "..."
-                service_create(sys.argv[3], 'vpls')
-            elif sys.argv[2]=='delete':
-                print "Deleting service " + sys.argv[3] + "..."
-                service_delete(sys.argv[3])
-            else:
-                print "Error: '" + sys.argv[2] + "' is an unknown service parameter\n"
-                usage()
-        else:
-            sys.stdout.write("Error: incorrect service parameters\n\n")
-            usage()
-    else:
-        sys.stdout.write("Error: Missing parameter\n\n")
-        usage()
+
+parser = ArghParser()
+parser.add_commands([node_add, node_delete, node_list],
+                    namespace='node', 
+                    namespace_kwargs={
+                        'title': 'Node Operations', 
+                        'description': 'Node Operations ', 
+                        'help': 'Node Operations'
+                    })
+parser.add_commands([service_create, service_delete, service_attach, service_detach, service_list], 
+                    namespace='service', 
+                    namespace_kwargs={
+                        'title': 'Service Operations', 
+                        'description': 'Service Operations', 
+                        'help': 'Service Operations'
+                    })
+parser.add_commands([sub_interface_create, sub_interface_delete, sub_interface_list], 
+                    namespace='subinterface', 
+                    namespace_kwargs={
+                        'title': 'Port Operations', 
+                        'description': 'Port Operations', 
+                        'help': 'Port Operations'
+                    })                    
+parser.add_commands([reinit_db])
+
+
+
+#    if lattice_function == 'reinit':
+#        reinit_db()
+#    elif lattice_function == 'node':
+#        if len(sys.argv) >= 3:
+#            if sys.argv[2]=='list':
+#                print "Printing node list..."
+#                node_list()
+#            elif sys.argv[2]=='add':
+#                # node add <type> <ip_address> <username> <password>
+#                # Open device, retrieve Serial Number and Model
+#                print "Adding node " + sys.argv[4] + "..."
+#                switchFactory = NodeFactory()
+#                # connect to device and populate new_switch object
+#                new_switch = switchFactory.create_switch(sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+#                # pass populated switch object to add_switch for importing into db
+#                node_add(new_switch)
+#                ports_table = new_switch.port_table
+#                ports_add(new_switch, ports_table)
+#            elif sys.argv[2]=='delete':
+#                print "Deleting node " + sys.argv[3] + "..."
+#                node_delete(sys.argv[3])
+#            else:
+#                print "Error: '" + sys.argv[2] + "' is an unknown node parameter\n"
+#                usage()
+#        else:
+#            sys.stdout.write("Error: incorrect node parameters\n\n")
+#            usage()
+#    elif lattice_function == 'subinterface':
+#        if len(sys.argv) >= 3:
+#            if sys.argv[2]=='list':
+#                print "Printing subinterface list..."
+#                sub_interface_list()
+#            elif sys.argv[2]=='create':
+#                print "Creating subinterface " + sys.argv[3] + "..."
+#                sub_interface_create(sys.argv[3], sys.argv[3], 'sid'+sys.argv[3], 'Active', 'ge-0/0/0')
+#            elif sys.argv[2]=='delete':
+#                print "Deleting subinterface " + sys.argv[3] + "..."
+#                sub_interface_delete(sys.argv[3], 'ge-0/0/0')
+#            elif sys.argv[2]=='attach':
+#                print "Attaching subinterface " + sys.argv[3] + " to node " + sys.argv[4]
+#            else:
+#                print "Error: '" + sys.argv[2] + "' is an unknown service parameter\n"
+#                usage()
+#        else:
+#            sys.stdout.write("Error: incorrect service parameters\n\n")
+#            usage()
+#    elif lattice_function == 'service':
+#        if len(sys.argv) >= 3:
+#            if sys.argv[2]=='list':
+#                print "Printing service list..." 
+#                service_list()
+#            elif sys.argv[2]=='create':
+#                print "Creating service " + sys.argv[3] + "..."
+#                service_create(sys.argv[3], 'vpls')
+#            elif sys.argv[2]=='delete':
+#                print "Deleting service " + sys.argv[3] + "..."
+#                service_delete(sys.argv[3])
+#            else:
+#                print "Error: '" + sys.argv[2] + "' is an unknown service parameter\n"
+#                usage()
+#        else:
+#            sys.stdout.write("Error: incorrect service parameters\n\n")
+#            usage()
+#    else:
+#        sys.stdout.write("Error: Missing parameter\n\n")
+#        usage()
 
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    parser.dispatch()
