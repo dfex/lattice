@@ -162,6 +162,7 @@ def sub_interface_list():
 def sub_interface_create(sub_interface_unit, sub_interface_vlan_id, service_id, sub_interface_status, port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
+    # This needs a re-think.  Needs to reference port and node, and enforce db schema
     cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, SubInterfaceVLANID, ServiceID, SubInterfaceStatus, PortID) VALUES(?, ?, ?, ?, ?)",(sub_interface_unit, sub_interface_vlan_id, service_id, sub_interface_status, port_id))
     db_connection.commit()
     close_db(db_connection)
@@ -170,6 +171,7 @@ def sub_interface_create(sub_interface_unit, sub_interface_vlan_id, service_id, 
 def sub_interface_delete(sub_interface_unit, port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
+    # This needs a re-think.  Needs to reference port and node, and enforce db schema
     cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceUnit = ? AND portID = ?",(sub_interface_unit, port_id))
     db_connection.commit()
     close_db(db_connection)
@@ -178,6 +180,8 @@ def sub_interface_delete(sub_interface_unit, port_id):
 def service_create(service_name, service_type):
     db_connection = open_db()
     cur = db_connection.cursor()
+    # Limit the service types?
+    # These only exist in the db until they are attached to a sub-interface
     cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (service_name, service_type))
     db_connection.commit()
     close_db(db_connection)
@@ -186,6 +190,9 @@ def service_create(service_name, service_type):
 def service_delete(service_id):
     db_connection = open_db()
     cur = db_connection.cursor()
+    # Need to detach service from all referenced sub-interfaces and push out config - eg: a call to service_detach
+    # do a service_detach before deleting so that schema is enforced
+    # May need to do a join to find the matching service_id
     cur.execute("DELETE FROM ServiceTable WHERE ServiceID = ?", (service_id,))
     db_connection.commit()
     close_db(db_connection)
@@ -204,6 +211,8 @@ def service_list():
 def service_attach(service_id, sub_interface_id):
     db_connection = open_db()
     cur = db_connection.cursor()
+    # Change the below so that a service is attached to a subinterface in the subinterface table, not the other way around
+    # Need to reach out to affected nodes and update configuration
     cur.execute("UPDATE ServiceTable SET ServiceID = VALUES(?,) WHERE SubInterfaceID = VALUES(?,)",(service_id, subnterface_id))
     close_db(db_connection)
     db_connection.commit()
@@ -212,6 +221,8 @@ def service_attach(service_id, sub_interface_id):
 def service_detach(service_id):
     db_connection = open_db()
     cur = db_connection.cursor()
+    # Change the below to remove the service from the subinterface in the subinterface table based on the ID
+    # Need to reach out to affected nodes and update configuration
     cur.execute("DELETE FROM ServiceTable WHERE ServiceID = ?",(service_id))
     close_db(db_connection)
     db_connection.commit()
