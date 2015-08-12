@@ -183,10 +183,10 @@ def service_create(service_name, service_type):
     close_db(db_connection)
 
 @named('delete')
-def service_delete(service_name):
+def service_delete(service_id):
     db_connection = open_db()
     cur = db_connection.cursor()
-    cur.execute("DELETE FROM ServiceTable WHERE ServiceName = ?", (service_name,))
+    cur.execute("DELETE FROM ServiceTable WHERE ServiceID = ?", (service_id,))
     db_connection.commit()
     close_db(db_connection)
 
@@ -215,18 +215,6 @@ def service_detach(service_id):
     cur.execute("DELETE FROM ServiceTable WHERE ServiceID = ?",(service_id))
     close_db(db_connection)
     db_connection.commit()
-
-
-#def main(argv):
-#    sys.stdout.write("lattice\n\n")
-#    lattice_Function=''
-#    if len(sys.argv) <= 1:
-#        usage()
-#        exit(1)
-#    else:
-#        lattice_function = sys.argv[1]
-    # Okay, this is getting ugly - fix up with argparse library or similar
-    # Think through the grammar so that it makes sense when the REST API is added
 
 parser = ArghParser()
 parser.add_commands([node_add, node_delete, node_list],
@@ -258,75 +246,6 @@ parser.add_commands([sub_interface_create, sub_interface_delete, sub_interface_l
                         'help': 'Port Operations'
                     })                    
 parser.add_commands([reinit_db])
-
-
-
-#    if lattice_function == 'reinit':
-#        reinit_db()
-#    elif lattice_function == 'node':
-#        if len(sys.argv) >= 3:
-#            if sys.argv[2]=='list':
-#                print "Printing node list..."
-#                node_list()
-#            elif sys.argv[2]=='add':
-#                # node add <type> <ip_address> <username> <password>
-#                # Open device, retrieve Serial Number and Model
-#                print "Adding node " + sys.argv[4] + "..."
-#                switchFactory = NodeFactory()
-#                # connect to device and populate new_switch object
-#                new_switch = switchFactory.create_switch(sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
-#                # pass populated switch object to add_switch for importing into db
-#                node_add(new_switch)
-#                ports_table = new_switch.port_table
-#                ports_add(new_switch, ports_table)
-#            elif sys.argv[2]=='delete':
-#                print "Deleting node " + sys.argv[3] + "..."
-#                node_delete(sys.argv[3])
-#            else:
-#                print "Error: '" + sys.argv[2] + "' is an unknown node parameter\n"
-#                usage()
-#        else:
-#            sys.stdout.write("Error: incorrect node parameters\n\n")
-#            usage()
-#    elif lattice_function == 'subinterface':
-#        if len(sys.argv) >= 3:
-#            if sys.argv[2]=='list':
-#                print "Printing subinterface list..."
-#                sub_interface_list()
-#            elif sys.argv[2]=='create':
-#                print "Creating subinterface " + sys.argv[3] + "..."
-#                sub_interface_create(sys.argv[3], sys.argv[3], 'sid'+sys.argv[3], 'Active', 'ge-0/0/0')
-#            elif sys.argv[2]=='delete':
-#                print "Deleting subinterface " + sys.argv[3] + "..."
-#                sub_interface_delete(sys.argv[3], 'ge-0/0/0')
-#            elif sys.argv[2]=='attach':
-#                print "Attaching subinterface " + sys.argv[3] + " to node " + sys.argv[4]
-#            else:
-#                print "Error: '" + sys.argv[2] + "' is an unknown service parameter\n"
-#                usage()
-#        else:
-#            sys.stdout.write("Error: incorrect service parameters\n\n")
-#            usage()
-#    elif lattice_function == 'service':
-#        if len(sys.argv) >= 3:
-#            if sys.argv[2]=='list':
-#                print "Printing service list..." 
-#                service_list()
-#            elif sys.argv[2]=='create':
-#                print "Creating service " + sys.argv[3] + "..."
-#                service_create(sys.argv[3], 'vpls')
-#            elif sys.argv[2]=='delete':
-#                print "Deleting service " + sys.argv[3] + "..."
-#                service_delete(sys.argv[3])
-#            else:
-#                print "Error: '" + sys.argv[2] + "' is an unknown service parameter\n"
-#                usage()
-#        else:
-#            sys.stdout.write("Error: incorrect service parameters\n\n")
-#            usage()
-#    else:
-#        sys.stdout.write("Error: Missing parameter\n\n")
-#        usage()
 
 if __name__ == "__main__":
     parser.dispatch()
