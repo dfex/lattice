@@ -87,12 +87,19 @@ def node_list():
     close_db(db_connection)
 
 @named('add')
-def node_add(switch):
+def node_add(type, ip_address, username, password):
     inet_Regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
-    if inet_Regex.match(switch.ip_address):
+    switchFactory = NodeFactory()
+    # connect to device and populate new_switch object
+    new_switch = switchFactory.create_switch(type, ip_address, username, password)
+    # pass populated switch object to add_switch for importing into db
+    ports_table = new_switch.port_table
+    ports_add(new_switch, ports_table)
+
+    if inet_Regex.match(ip_address):
         db_connection = open_db()
         cur = db_connection.cursor()
-        cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus, NodeUser, NodePass) VALUES(?, ?, ?, ?, ?, ?, ?)",(switch.host_name, switch.switch_type, switch.ip_address, 'Lab', switch.status, switch.user_name, encrypt(constants.CONST_DBKEY, switch.password)))
+        cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus, NodeUser, NodePass) VALUES(?, ?, ?, ?, ?, ?, ?)",(new_switch.host_name, new_switch.switch_type, new_switch.ip_address, 'Lab', new_switch.status, new_switch.user_name, encrypt(constants.CONST_DBKEY, new_switch.password)))
         db_connection.commit()
         close_db(db_connection)
     else:
@@ -100,25 +107,44 @@ def node_add(switch):
 	    sys.exit(1)
 
 @named('delete')
-def node_delete(node_ip_address):
+def node_delete(ip_address):
     # Probably should delete by Primary Key, even though nodeIPAddress will be unique
     inet_regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$")
-    if inet_regex.match(node_ip_address):
+    if inet_regex.match(ip_address):
         db_connection = open_db()
         cur = db_connection.cursor()
-        print "Deleting " + node_ip_address
-        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = ?",(node_ip_address,))
+        print "Deleting " + ip_address
+        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = ?",(ip_address,))
         db_connection.commit()
         close_db(db_connection)
     else:
         sys.stdout.write("node_delete() ERROR: Invalid IP Address")
         sys.exit(1)
 
+@named('add')
 def ports_add(switch, ports_table):
     db_connection = open_db()
     cur = db_connection.cursor()
     for port in ports_table:
         cur.execute("INSERT INTO PortTable(PortName, PortStatus, PortSpeed, CustomerID, NodeID) VALUES(?, ?, ?, ?, ?)",(port['name'], port['oper_status'], port['speed'], 'lattice', switch.host_name))
+    db_connection.commit()
+    close_db(db_connection)
+
+@named('list')
+def ports_list():
+    db_connection = open_db()
+    cur = db_connection.cursor()
+    cur.execute("SELECT PortID, PortName, PortStatus, PortSpeed, CustomerID, NodeID FROM PortTable")
+    node_Rows = cur.fetchall()
+    for node in node_Rows:
+        print node
+    close_db(db_connection)
+
+@named('delete')
+def ports_delete(port_id):
+    db_connection = open_db()
+    cur = db_connection.cursor()
+    cur.execute("DELETE FROM PortTable WHERE PortID = ?",(port_id))
     db_connection.commit()
     close_db(db_connection)
 
@@ -210,6 +236,13 @@ parser.add_commands([node_add, node_delete, node_list],
                         'description': 'Node Operations ', 
                         'help': 'Node Operations'
                     })
+parser.add_commands([ports_add, ports_list, ports_delete],
+                    namespace='port', 
+                    namespace_kwargs={
+                        'title': 'Port Operations', 
+                        'description': 'Port Operations ', 
+                        'help': 'Port Operations'
+                    })                    
 parser.add_commands([service_create, service_delete, service_attach, service_detach, service_list], 
                     namespace='service', 
                     namespace_kwargs={
