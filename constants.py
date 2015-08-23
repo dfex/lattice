@@ -4,3 +4,4 @@
 
 CONST_DBKEY = 'oO]*RiK%FRIo#sjBhqp'
 
+service_types = ['vxlan', 'qinq', 'vpls', 'l2vpn']

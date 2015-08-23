@@ -6,7 +6,7 @@ import re, sys, getopt
 import sqlite3
 from argh import named, ArghParser, expects_obj
 from device_Factory import NodeFactory
-import constants
+from constants import service_types
 from getpass import getpass
 from pprint import pprint
 from xor64 import encrypt, decrypt
@@ -163,13 +163,16 @@ def sub_interface_delete(sub_interface_unit, port_id):
 
 @named('create')
 def service_create(service_name, service_type):
-    db_connection = open_db()
-    cur = db_connection.cursor()
-    # Limit the service types?
-    # These only exist in the db until they are attached to a sub-interface
-    cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (service_name, service_type))
-    db_connection.commit()
-    close_db(db_connection)
+    if service_type in service_types:
+        db_connection = open_db()
+        cur = db_connection.cursor()
+        # Limit the service types?  Need a global definition that is updated as templates are created.
+        # These only exist in the db until they are attached to a sub-interface
+        cur.execute("INSERT INTO ServiceTable(ServiceName, ServiceType) VALUES(?, ?)", (service_name, service_type))
+        db_connection.commit()
+        close_db(db_connection)
+    else:
+        print "Error in service creation: invalid service type specified.  Valid service types are: " + str(service_types)
 
 @named('delete')
 def service_delete(service_id):
