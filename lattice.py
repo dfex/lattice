@@ -61,21 +61,6 @@ def reinit_db():
     else:
         print "Confirmation cancelled"
 
-def usage():
-    sys.stdout.write("Usage: lattice reinit\n")
-    sys.stdout.write("Usage: lattice node add <ip address>\n")
-    sys.stdout.write("Usage: lattice node delete <ip address>\n")
-    sys.stdout.write("Usage: lattice node list\n")
-    sys.stdout.write("Usage: lattice subinterface create <node> <port> <ID>\n")
-    sys.stdout.write("Usage: lattice subinterface delete <node> <port> <ID>\n")
-    sys.stdout.write("Usage: lattice subinterface list\n")
-    sys.stdout.write("Usage: lattice service create <service-name> <service type>\n")
-    sys.stdout.write("Usage: lattice service delete <id>\n")
-    sys.stdout.write("Usage: lattice service attach <service-name> <port> <ID>\n")
-    sys.stdout.write("Usage: lattice service detach <service-name> <port> <ID>\n")
-    sys.stdout.write("Usage: lattice service list\n")
-    sys.stdout.write("\n")
-
 @named('list')
 def node_list():
     db_connection = open_db()
