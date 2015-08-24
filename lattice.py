@@ -207,21 +207,20 @@ def service_list():
 def service_attach(service_id, sub_interface_id):
     db_connection = open_db()
     cur = db_connection.cursor()
-    # Change the below so that a service is attached to a subinterface in the subinterface table, not the other way around
-    # Need to reach out to affected nodes and update configuration
-    cur.execute("UPDATE ServiceTable SET ServiceID = VALUES(?,) WHERE SubInterfaceID = VALUES(?,)",(service_id, subnterface_id))
-    close_db(db_connection)
+    cur.execute("UPDATE SubInterfaceTable SET ServiceID = ? WHERE SubInterfaceID = ?",(service_id, sub_interface_id))
     db_connection.commit()
+    close_db(db_connection)
+    # Still need to reach out to affected nodes and update configuration
 
 @named('detach')
-def service_detach(sub_interface_id):
+def service_detach(service_id, sub_interface_id):
     db_connection = open_db()
     cur = db_connection.cursor()
     # Change the below to remove the service from the subinterface in the subinterface table based on the ID
     # Need to reach out to affected nodes and update configuration
-    cur.execute("DELETE FROM ServiceTable WHERE ServiceID = ?",(service_id,))
-    close_db(db_connection)
+    cur.execute("DELETE FROM SubInterfaceTable WHERE ServiceID = ? AND SubInterfaceID = ?",(service_id, sub_interface_id))
     db_connection.commit()
+    close_db(db_connection)
 
 parser = ArghParser()
 parser.add_commands([node_add, node_delete, node_list],
