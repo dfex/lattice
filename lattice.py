@@ -93,12 +93,13 @@ def node_add(type, ip_address, username, password):
 @named('delete')
 def node_delete(ip_address):
     # Probably should delete by Primary Key, even though nodeIPAddress will be unique
+    # Delete dependant ports
     inet_regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$")
     if inet_regex.match(ip_address):
         db_connection = open_db()
         cur = db_connection.cursor()
-        print "Deleting " + ip_address
         cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = ?",(ip_address,))
+        
         db_connection.commit()
         close_db(db_connection)
     else:
@@ -132,6 +133,7 @@ def ports_list():
 def ports_delete(port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
+    # Delete dependent sub-interfaces
     cur.execute("DELETE FROM PortTable WHERE PortID = ?", (port_id,))
     db_connection.commit()
     close_db(db_connection)
@@ -148,6 +150,7 @@ def sub_interface_list():
 
 @named('create')
 def sub_interface_create(node_name, port_name, sub_interface_unit):
+    #change this back to IDs
     db_connection = open_db()
     cur = db_connection.cursor()
     cur.execute("SELECT NodeID FROM NodeTable WHERE NodeName = ?", (node_name,))
@@ -160,6 +163,7 @@ def sub_interface_create(node_name, port_name, sub_interface_unit):
 
 @named('delete')
 def sub_interface_delete(node_name, port_name, sub_interface_unit):
+    #change this back to IDs
     db_connection = open_db()
     cur = db_connection.cursor()
     cur.execute("SELECT NodeID FROM NodeTable WHERE NodeName = ?", (node_name,))
