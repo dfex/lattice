@@ -150,14 +150,10 @@ def sub_interface_list():
 def sub_interface_create(node_name, port_name, sub_interface_unit):
     db_connection = open_db()
     cur = db_connection.cursor()
-    # This needs a re-think.  Needs to reference port and node, and enforce db schema
-    # Need to use node_name and port_name to identify port_id and then put it into the SubInterfaceTable row
     cur.execute("SELECT NodeID FROM NodeTable WHERE NodeName = ?", (node_name,))
-    node_id = cur.fetchone()  ## What type is this?
-    # print "Node ID:" + str(node_id[0])
+    node_id = cur.fetchone()
     cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ?", (node_id[0],))
     port_id = str(cur.fetchone())
-    # print "Port ID:" + port_id[1]
     cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id[1]))
     db_connection.commit()
     close_db(db_connection)
@@ -166,8 +162,11 @@ def sub_interface_create(node_name, port_name, sub_interface_unit):
 def sub_interface_delete(node_name, port_name, sub_interface_unit):
     db_connection = open_db()
     cur = db_connection.cursor()
-    # This needs a re-think.  Needs to reference port and node, and enforce db schema
-    cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceUnit = ? AND portID = ?",(sub_interface_unit, port_id))
+    cur.execute("SELECT NodeID FROM NodeTable WHERE NodeName = ?", (node_name,))
+    node_id = cur.fetchone()
+    cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ?", (node_id[0],))
+    port_id = str(cur.fetchone())
+    cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceUnit = ? AND portID = ?",(sub_interface_unit, port_id[1]))
     db_connection.commit()
     close_db(db_connection)
 
