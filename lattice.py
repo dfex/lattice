@@ -76,7 +76,7 @@ def node_add(type, ip_address, username, password):
     switchFactory = NodeFactory()
     # connect to device and populate new_switch object
     new_switch = switchFactory.create_switch(type, ip_address, username, password)
-    # pass populated switch object to add_switch for importing into db
+    # populate ports_table object to pass to ports_add for importing into db later
     ports_table = new_switch.port_table
 
     if inet_Regex.match(ip_address):
@@ -98,7 +98,7 @@ def node_delete(ip_address):
         db_connection = open_db()
         cur = db_connection.cursor()
         print "Deleting " + ip_address
-        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = ?",[ip_address])
+        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = ?",(ip_address,))
         db_connection.commit()
         close_db(db_connection)
     else:
@@ -132,7 +132,7 @@ def ports_list():
 def ports_delete(port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
-    cur.execute("DELETE FROM PortTable WHERE PortID = ?",[port_id])
+    cur.execute("DELETE FROM PortTable WHERE PortID = ?", (port_id,))
     db_connection.commit()
     close_db(db_connection)
 
@@ -140,7 +140,7 @@ def ports_delete(port_id):
 def sub_interface_list():
     db_connection = open_db()
     cur = db_connection.cursor()
-    cur.execute("SELECT SubInterfaceID, SubInterfaceUnit, SubInterfaceStatus, PortID FROM SubInterfaceTable")
+    cur.execute("SELECT SubInterfaceID, SubInterfaceUnit, ServiceID, SubInterfaceStatus, PortID FROM SubInterfaceTable")
     sub_interface_rows = cur.fetchall()
     for sub_interface in sub_interface_rows:
         print sub_interface
@@ -152,13 +152,13 @@ def sub_interface_create(node_name, port_name, sub_interface_unit):
     cur = db_connection.cursor()
     # This needs a re-think.  Needs to reference port and node, and enforce db schema
     # Need to use node_name and port_name to identify port_id and then put it into the SubInterfaceTable row
-    cur.execute("SELECT NodeID FROM NodeTable WHERE NodeName = ?", [node_name])
-    node_id = str(cur.fetchall())  ## What type is this?
-    print "Node ID:" + node_id
-    cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ?", [node_id])
-    port_id = str(cur.fetchall())
-    print "Port ID:" + port_id
-    cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id))
+    cur.execute("SELECT NodeID FROM NodeTable WHERE NodeName = ?", (node_name,))
+    node_id = cur.fetchone()  ## What type is this?
+    # print "Node ID:" + str(node_id[0])
+    cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ?", (node_id[0],))
+    port_id = str(cur.fetchone())
+    # print "Port ID:" + port_id[1]
+    cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id[1]))
     db_connection.commit()
     close_db(db_connection)
 
@@ -220,7 +220,7 @@ def service_detach(sub_interface_id):
     cur = db_connection.cursor()
     # Change the below to remove the service from the subinterface in the subinterface table based on the ID
     # Need to reach out to affected nodes and update configuration
-    cur.execute("DELETE FROM ServiceTable WHERE ServiceID = ?",(service_id))
+    cur.execute("DELETE FROM ServiceTable WHERE ServiceID = ?",(service_id,))
     close_db(db_connection)
     db_connection.commit()
 
