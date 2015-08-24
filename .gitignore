@@ -4,3 +4,4 @@
 *.db
 *.sqlite
 *.pyc
+sqlite-toy.py
