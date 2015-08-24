@@ -189,7 +189,11 @@ def service_delete(service_id):
     # do a service_detach before deleting so that schema is enforced
     # May need to do a join to find the matching service_id
     # Error checking
-    cur.execute("DELETE FROM ServiceTable WHERE ServiceID = ?", (service_id,))
+    cur.execute("SELECT SubInterfaceID FROM SubInterfaceTable WHERE ServiceID = ?", (service_id,))
+    sub_interface_id_rows = cur.fetchall()
+    for sub_interface_id in sub_interface_id_rows:
+        service_detach(service_id, sub_interface_id[0])
+    cur.execute("DELETE FROM ServiceTable WHERE ServiceID = ?", (service_id))
     db_connection.commit()
     close_db(db_connection)
 
@@ -216,11 +220,10 @@ def service_attach(service_id, sub_interface_id):
 def service_detach(service_id, sub_interface_id):
     db_connection = open_db()
     cur = db_connection.cursor()
-    # Change the below to remove the service from the subinterface in the subinterface table based on the ID
-    # Need to reach out to affected nodes and update configuration
-    cur.execute("DELETE FROM SubInterfaceTable WHERE ServiceID = ? AND SubInterfaceID = ?",(service_id, sub_interface_id))
+    cur.execute("UPDATE SubInterfaceTable SET ServiceID = ? WHERE SubInterfaceID = ?",(None, sub_interface_id))
     db_connection.commit()
     close_db(db_connection)
+    # Need to reach out to affected nodes and update configuration
 
 parser = ArghParser()
 parser.add_commands([node_add, node_delete, node_list],
