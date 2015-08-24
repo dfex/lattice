@@ -50,7 +50,7 @@ def reinit_db():
         cur.execute("CREATE TABLE LocationTable (LocationID INTEGER PRIMARY KEY ASC, LocationName TEXT NOT NULL, RackID TEXT, RackUnit INTEGER, FacilityName TEXT NOT NULL, FacilityFloor TEXT, FacilityAddress TEXT NOT NULL, FacilityState TEXT NOT NULL, FacilityCountry TEXT NOT NULL, LocationStatus TEXT NOT NULL);")
         cur.execute("CREATE TABLE NodeTable (NodeID INTEGER PRIMARY KEY ASC, NodeName TEXT, NodeType TEXT NOT NULL, NodeIPAddress TEXT NOT NULL, LocationID INTEGER, NodeStatus TEXT, NodeUser TEXT, NodePass TEXT, FOREIGN KEY(LocationID) REFERENCES LocationTable(LocationID));")
         cur.execute("CREATE TABLE PortTable (PortID INTEGER PRIMARY KEY ASC, PortName TEXT NOT NULL, PortStatus TEXT, PortSpeed INTEGER, CustomerID TEXT, NodeID INTEGER, FOREIGN KEY(NodeID) REFERENCES NodeTable(NodeID));")
-        cur.execute("CREATE TABLE SubInterfaceTable (SubInterfaceID INTEGER PRIMARY KEY ASC, SubInterfaceUnit INTEGER, ServiceID INTEGER, SubInterfaceStatus TEXT NOT NULL, PortID INTEGER, FOREIGN KEY(ServiceID) REFERENCES ServiceTable(ServiceID), FOREIGN KEY (PortID) REFERENCES PortTable(PortID));")
+        cur.execute("CREATE TABLE SubInterfaceTable (SubInterfaceID INTEGER PRIMARY KEY ASC, SubInterfaceUnit INTEGER, ServiceID INTEGER, SubInterfaceStatus TEXT, PortID INTEGER, FOREIGN KEY(ServiceID) REFERENCES ServiceTable(ServiceID), FOREIGN KEY (PortID) REFERENCES PortTable(PortID));")
         cur.execute("CREATE TABLE ServiceTable (ServiceID INTEGER PRIMARY KEY ASC, ServiceName TEXT NOT NULL, ServiceType TEXT NOT NULL);")
         cur.execute("CREATE TABLE AuthorisationTable (CustomerID INTEGER, UserName TEXT, AuthorisationRole TEXT, PortID INTEGER, SubInterfaceID INTEGER, FOREIGN KEY(CustomerID) REFERENCES CustomerTable(CustomerID), FOREIGN KEY(UserName) REFERENCES UserTable(UserName), FOREIGN KEY(PortID) REFERENCES PortTable(PortID), FOREIGN KEY(SubInterfaceID) REFERENCES SubInterfaceTable(SubInterfaceID));")
         cur.execute("CREATE TABLE TransactionLog (TransactionID INTEGER PRIMARY KEY ASC, TransactionTimeStamp TEXT, UserID TEXT, IPAddress TEXT, EventType TEXT, PortID TEXT, SubInterfaceID TEXT, EventDescription TEXT);")
@@ -78,7 +78,6 @@ def node_add(type, ip_address, username, password):
     new_switch = switchFactory.create_switch(type, ip_address, username, password)
     # pass populated switch object to add_switch for importing into db
     ports_table = new_switch.port_table
-    ports_add(new_switch, ports_table)
 
     if inet_Regex.match(ip_address):
         db_connection = open_db()
@@ -86,6 +85,7 @@ def node_add(type, ip_address, username, password):
         cur.execute("INSERT INTO NodeTable(NodeName, NodeType, NodeIPAddress, LocationID, NodeStatus, NodeUser, NodePass) VALUES(?, ?, ?, ?, ?, ?, ?)",(new_switch.host_name, new_switch.switch_type, new_switch.ip_address, 'Lab', new_switch.status, new_switch.user_name, encrypt(CONST_DBKEY, new_switch.password)))
         db_connection.commit()
         close_db(db_connection)
+        ports_add(new_switch, ports_table)
     else:
 	    sys.stdout.write("node_add() ERROR: Invalid IP Address")
 	    sys.exit(1)
@@ -98,7 +98,7 @@ def node_delete(ip_address):
         db_connection = open_db()
         cur = db_connection.cursor()
         print "Deleting " + ip_address
-        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = ?",(ip_address,))
+        cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = ?",[ip_address])
         db_connection.commit()
         close_db(db_connection)
     else:
@@ -109,8 +109,12 @@ def node_delete(ip_address):
 def ports_add(switch, ports_table):
     db_connection = open_db()
     cur = db_connection.cursor()
-    for port in ports_table:
-        cur.execute("INSERT INTO PortTable(PortName, PortStatus, PortSpeed, CustomerID, NodeID) VALUES(?, ?, ?, ?, ?)",(port['name'], port['oper_status'], port['speed'], 'lattice', switch.host_name))
+    node_ip = str(switch.ip_address)
+    for port in ports_table:  #work out the NodeID (table index, not hostname)
+        cur.execute("SELECT NodeID FROM NodeTable WHERE NodeIPAddress = ?", (node_ip,))
+        node_id = cur.fetchone()
+        # print "Node ID is: " + str(node_id[0])
+        cur.execute("INSERT INTO PortTable(PortName, PortStatus, PortSpeed, CustomerID, NodeID) VALUES(?, ?, ?, ?, ?)",(port['name'], port['oper_status'], port['speed'], 'lattice', node_id[0]))
     db_connection.commit()
     close_db(db_connection)
 
@@ -128,7 +132,7 @@ def ports_list():
 def ports_delete(port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
-    cur.execute("DELETE FROM PortTable WHERE PortID = ?",(port_id))
+    cur.execute("DELETE FROM PortTable WHERE PortID = ?",[port_id])
     db_connection.commit()
     close_db(db_connection)
 
@@ -136,7 +140,7 @@ def ports_delete(port_id):
 def sub_interface_list():
     db_connection = open_db()
     cur = db_connection.cursor()
-    cur.execute("SELECT SubInterfaceID, SubInterfaceUnit, SubInterfaceVLANID, SubInterfaceStatus, PortID FROM SubInterfaceTable")
+    cur.execute("SELECT SubInterfaceID, SubInterfaceUnit, SubInterfaceStatus, PortID FROM SubInterfaceTable")
     sub_interface_rows = cur.fetchall()
     for sub_interface in sub_interface_rows:
         print sub_interface
@@ -148,16 +152,18 @@ def sub_interface_create(node_name, port_name, sub_interface_unit):
     cur = db_connection.cursor()
     # This needs a re-think.  Needs to reference port and node, and enforce db schema
     # Need to use node_name and port_name to identify port_id and then put it into the SubInterfaceTable row
-    cur.execute("SELECT NodeID FROM NodeTable WHERE NodeName = ?", (node_name,))
+    cur.execute("SELECT NodeID FROM NodeTable WHERE NodeName = ?", [node_name])
     node_id = str(cur.fetchall())  ## What type is this?
-    cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ?", (node_id,))
+    print "Node ID:" + node_id
+    cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ?", [node_id])
     port_id = str(cur.fetchall())
+    print "Port ID:" + port_id
     cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id))
     db_connection.commit()
     close_db(db_connection)
 
 @named('delete')
-def sub_interface_delete(sub_interface_unit, port_id):
+def sub_interface_delete(node_name, port_name, sub_interface_unit):
     db_connection = open_db()
     cur = db_connection.cursor()
     # This needs a re-think.  Needs to reference port and node, and enforce db schema
