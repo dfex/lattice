@@ -6,7 +6,7 @@ import re, sys, getopt
 import sqlite3
 from argh import named, ArghParser, expects_obj
 from device_Factory import NodeFactory
-from constants import service_types, CONST_DBKEY
+from constants import service_types, device_types, CONST_DBKEY
 from getpass import getpass
 from pprint import pprint
 from xor64 import encrypt, decrypt
@@ -72,6 +72,9 @@ def node_list():
 
 @named('add')
 def node_add(type, ip_address, username, password):
+    if type not in device_types:
+        print "node_add error: " + type + " is an unknown device type"
+        sys.exit(1)
     inet_Regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$") 
     switchFactory = NodeFactory()
     # connect to device and populate new_switch object
@@ -133,9 +136,10 @@ def ports_delete(port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
     # Delete dependent sub-interfaces
-    cur.execute("SELECT SubInterfaceID FROM SubInterfaceTable WHERE PortID = ?",(port_id,))
-    sub_interface_id = str(cur.fetchone())
-    sub_interface_delete(sub_interface_id[1]) ## This is creating a recursive db open and lock
+    cur.execute("SELECT SubInterfaceID FROM SubInterfaceTable WHERE PortID = ?",(port_id,))    
+    sub_interface_id_rows = cur.fetchall()
+    for sub_interface_id in sub_interface_id_rows:
+        sub_interface_delete(sub_interface_id[0])
     cur.execute("DELETE FROM PortTable WHERE PortID = ?", (port_id,))
     db_connection.commit()
     close_db(db_connection)
@@ -157,7 +161,7 @@ def sub_interface_create(node_name, port_name, sub_interface_unit):
     # These should be stand-alone functions - eg: getService(SubInterfaceID) - refactor later
     cur.execute("SELECT NodeID FROM NodeTable WHERE NodeName = ?", (node_name,))
     node_id = cur.fetchone()
-    cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ?", (node_id[0],))
+    cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ? AND PortName = ?", (node_id[0],port_name))
     port_id = str(cur.fetchone())
     cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id[1]))
     db_connection.commit()
@@ -169,7 +173,7 @@ def sub_interface_delete(sub_interface_id):
     cur = db_connection.cursor()
     # These should be stand-alone functions - eg: getService(SubInterfaceID) - refactor later
     cur.execute("SELECT ServiceID FROM SubInterfaceTable WHERE SubInterfaceID = ?",(sub_interface_id,))
-    service_id = cur.fetchone()
+    service_id = cur.fetchone() #One-to-one mapping between service and sub-interface
     service_detach(service_id[0], sub_interface_id)
     cur.execute("DELETE FROM SubInterfaceTable WHERE SubInterfaceID = ?",(sub_interface_id,))
     db_connection.commit()
