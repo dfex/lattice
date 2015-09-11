@@ -170,9 +170,15 @@ def sub_interface_create(node_name, port_name, sub_interface_unit):
     node_id = cur.fetchone()
     cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ? AND PortName = ?", (node_id[0],port_name))
     port_id = str(cur.fetchone())
-    cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id[1]))
-    db_connection.commit()
-    close_db(db_connection)
+    cur.execute("SELECT SubInterfaceID FROM SubInterfaceTable WHERE SubInterfaceUnit = ? and PortID = ?",(sub_interface_unit, port_id[1]))
+    existing_subinterface_id = str(cur.fetchone())
+    ##
+    if existing_subinterface_id == 'None':
+        cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id[1]))
+        db_connection.commit()
+        close_db(db_connection)
+    else:
+        print "Error: existing sub-interface-unit on interface"
 
 @named('delete')
 def sub_interface_delete(sub_interface_id):
