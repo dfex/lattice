@@ -95,14 +95,21 @@ def node_add(type, ip_address, username, password):
 
 @named('delete')
 def node_delete(ip_address):
-    # Probably should delete by Primary Key, even though nodeIPAddress will be unique
-    # Delete dependant ports
+    # Probably should delete by Primary Key, even though nodeIPAddress *should* be unique (multi-tenant solutions?)
     inet_regex = re.compile("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-1][0-9]|22[0-3])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$")
     if inet_regex.match(ip_address):
         db_connection = open_db()
         cur = db_connection.cursor()
+        # Determine the NodeID from the IP Address
+        cur.execute("SELECT NodeID FROM NodeTable WHERE NodeIPAddress = ?",(ip_address,))
+        node_id = cur.fetchone()
+        # Delete all Ports associated with that NodeID 
+        cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ?",(node_id[0],))    
+        port_id_rows = cur.fetchall()
+        for port_id in port_id_rows:
+            ports_delete(port_id[0])
+        # Now remove Node
         cur.execute("DELETE FROM NodeTable WHERE NodeIPAddress = ?",(ip_address,))
-        
         db_connection.commit()
         close_db(db_connection)
     else:
@@ -163,9 +170,15 @@ def sub_interface_create(node_name, port_name, sub_interface_unit):
     node_id = cur.fetchone()
     cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ? AND PortName = ?", (node_id[0],port_name))
     port_id = str(cur.fetchone())
-    cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id[1]))
-    db_connection.commit()
-    close_db(db_connection)
+    cur.execute("SELECT SubInterfaceID FROM SubInterfaceTable WHERE SubInterfaceUnit = ? and PortID = ?",(sub_interface_unit, port_id[1]))
+    existing_subinterface_id = str(cur.fetchone())
+    # Confirm that the sub-interface unit is unique on this PortID (and hence node)
+    if existing_subinterface_id == 'None':
+        cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id[1]))
+        db_connection.commit()
+        close_db(db_connection)
+    else:
+        print "Error: specified sub-interface unit already exists on this interface"
 
 @named('delete')
 def sub_interface_delete(sub_interface_id):
