@@ -143,7 +143,7 @@ def ports_delete(port_id):
     db_connection = open_db()
     cur = db_connection.cursor()
     # Delete dependent sub-interfaces
-    cur.execute("SELECT SubInterfaceID FROM SubInterfaceTable WHERE PortID = ?",(port_id,))    
+    cur.execute("SELECT SubInterfaceID FROM SubInterfaceTable WHERE PortID = ?",(port_id,))
     sub_interface_id_rows = cur.fetchall()
     for sub_interface_id in sub_interface_id_rows:
         sub_interface_delete(sub_interface_id[0])
@@ -168,13 +168,19 @@ def sub_interface_create(node_name, port_name, sub_interface_unit):
     # These should be stand-alone functions - eg: getService(SubInterfaceID) - refactor later
     cur.execute("SELECT NodeID FROM NodeTable WHERE NodeName = ?", (node_name,))
     node_id = cur.fetchone()
+    if str(node_id) == 'None':
+        print "Error: Invalid node specified"
+        exit(1)    
     cur.execute("SELECT PortID FROM PortTable WHERE NodeID = ? AND PortName = ?", (node_id[0],port_name))
-    port_id = str(cur.fetchone())
-    cur.execute("SELECT SubInterfaceID FROM SubInterfaceTable WHERE SubInterfaceUnit = ? and PortID = ?",(sub_interface_unit, port_id[1]))
+    port_id = cur.fetchone()
+    if str(port_id) =='None':
+        print "Error: Invalid port specified"
+        exit(1)
+    cur.execute("SELECT SubInterfaceID FROM SubInterfaceTable WHERE SubInterfaceUnit = ? and PortID = ?",(sub_interface_unit, port_id[0]))
     existing_subinterface_id = str(cur.fetchone())
     # Confirm that the sub-interface unit is unique on this PortID (and hence node)
     if existing_subinterface_id == 'None':
-        cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id[1]))
+        cur.execute("INSERT INTO SubInterfaceTable(SubInterfaceUnit, PortID) VALUES(?, ?)",(sub_interface_unit, port_id[0]))
         db_connection.commit()
         close_db(db_connection)
     else:
