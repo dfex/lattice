@@ -4,3 +4,6 @@
 *.db
 *.sqlite
 *.pyc
+sqlite-toy.py
+TEST-BUILD.txt
+offline ISSUES.txt
