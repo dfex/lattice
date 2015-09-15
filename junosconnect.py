@@ -87,7 +87,6 @@ class Junos_Device(Switch):
         cu.load(template_path='service-templates/junos/ex/dot1ad-service.conf', template_vars=svlan_vars, merge=True)  
         cu.commit()       
         
-        
     def __init__(self, ip_address, user_name, password):
         self.ip_address = ip_address
         self.user_name = user_name
