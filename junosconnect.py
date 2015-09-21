@@ -84,7 +84,7 @@ class Junos_Device(Switch):
         bind_service_vars['svlan_name'] = svlan_name
         bind_service_vars['port_name'] = port_name
         cu = Config(self.connection)
-        cu.load(template_path='service-templates/junos/ex/dot1ad-service.conf', template_vars=svlan_vars, merge=True)  
+        cu.load(template_path='service-templates/junos/ex/dot1ad-service.conf', template_vars=bind_service_vars, merge=True)  
         cu.commit()       
         
     def __init__(self, ip_address, user_name, password):

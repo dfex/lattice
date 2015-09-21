@@ -239,7 +239,22 @@ def service_attach(service_id, sub_interface_id):
     cur.execute("UPDATE SubInterfaceTable SET ServiceID = ? WHERE SubInterfaceID = ?",(service_id, sub_interface_id))
     db_connection.commit()
     close_db(db_connection)
-    # Still need to reach out to affected nodes and update configuration
+    # device configuration section (maybe break out into dedicated function?)
+    db_connection = open_db()
+    cur = db_connection.cursor()
+    cur.execute("SELECT ServiceType, ServiceName FROM ServiceTable WHERE ServiceID = ?",(service_id,))
+    service_type_result = cur.fetchone()
+    cur.execute("SELECT PortID FROM SubInterfaceTable WHERE SubInterfaceID = ?",(sub_interface_id,))
+    port_id_result = cur.fetchone()
+    cur.execute("SELECT NodeID, PortName FROM PortTable WHERE PortID = ?",(port_id_result[0],))
+    node_id_result = cur.fetchone()    
+    cur.execute("SELECT NodeType, NodeIPAddress, NodeUser, NodePass FROM NodeTable WHERE NodeID = ?",(node_id_result[0],))
+    node_creds = cur.fetchone()
+    if service_type_result[0] == 'qinq':
+        nodeFactory = NodeFactory()
+        switch_instance = nodeFactory.create_switch(node_creds[0], node_creds[1], node_creds[2], decrypt(CONST_DBKEY, node_creds[3]))
+        switch_instance.bind_service(sub_interface_id, service_type_result[1], node_id_result[1])
+    close_db(db_connection)    
 
 @named('detach')
 def service_detach(service_id, sub_interface_id):
