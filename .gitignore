@@ -5,5 +5,7 @@
 *.sqlite
 *.pyc
 sqlite-toy.py
+crypt-toy.py
 TEST-BUILD.txt
 offline ISSUES.txt
+service-templates/junos/ex/delete-cvlan.xml
