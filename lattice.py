@@ -253,6 +253,11 @@ def service_attach(service_id, sub_interface_id):
     if service_type_result[0] == 'qinq':
         nodeFactory = NodeFactory()
         switch_instance = nodeFactory.create_switch(node_creds[0], node_creds[1], node_creds[2], decrypt(CONST_DBKEY, node_creds[3]))
+        print "Port: " + node_id_result[1]
+        switch_instance.create_port(node_id_result[1], 'Automated')
+        print "SVLAN ID: " + str(int(sub_interface_id)+1000)
+        print "VLAN Name: " + "v"+str(int(sub_interface_id)+1000)
+        switch_instance.create_svlan(str(int(sub_interface_id)+1000), service_type_result[1], "Automated")
         switch_instance.bind_service(sub_interface_id, service_type_result[1], node_id_result[1])
     close_db(db_connection)    
 
