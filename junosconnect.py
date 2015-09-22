@@ -63,7 +63,7 @@ class Junos_Device(Switch):
         port_vars['port_description'] = port_description
         cu = Config(self.connection)
         cu.load(template_path='service-templates/junos/ex/dot1ad-port.conf', template_vars=port_vars, merge=True)  
-        cu.commit()       
+#       cu.commit()       
 
     def create_svlan(self, vlan_id, svlan_name, vlan_description):
         """Create Service VLAN on switch
@@ -74,7 +74,7 @@ class Junos_Device(Switch):
         svlan_vars['vlan_description'] = vlan_description
         cu = Config(self.connection)
         cu.load(template_path='service-templates/junos/ex/dot1ad-vlan.conf', template_vars=svlan_vars, merge=True)  
-        cu.commit()       
+#       cu.commit()       
     
     def bind_service(self, cvlan_id, svlan_name, port_name):
         """Binds cvlan_id from port_name to svlan_name (one-to-one bundling)
@@ -85,8 +85,12 @@ class Junos_Device(Switch):
         bind_service_vars['port_name'] = port_name
         cu = Config(self.connection)
         cu.load(template_path='service-templates/junos/ex/dot1ad-service.conf', template_vars=bind_service_vars, merge=True)  
-        cu.commit()       
-        
+#       cu.commit()       
+
+    def commit_configuration(self):
+        cu = Config(self.connection)
+        cu.commit()
+           
     def __init__(self, ip_address, user_name, password):
         self.ip_address = ip_address
         self.user_name = user_name

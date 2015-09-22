@@ -259,6 +259,7 @@ def service_attach(service_id, sub_interface_id):
         print "VLAN Name: " + "v"+str(int(sub_interface_id)+1000)
         switch_instance.create_svlan(str(int(sub_interface_id)+1000), service_type_result[1], "Automated")
         switch_instance.bind_service(sub_interface_id, service_type_result[1], node_id_result[1])
+        switch_instance.commit_configuration
     close_db(db_connection)    
 
 @named('detach')
