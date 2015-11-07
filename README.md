@@ -1,9 +1,9 @@
 # lattice
-```lattice``` is an experimental toy for database-driven network programmability.
+```lattice``` is an application for provisioning network-based cross-connects in a Data Centre environment.
 
-```lattice``` takes network device(s) and loads operational information (interface names, protocol statuses etc) into a SQL (Lite) database, so that higher layer tools can access and process this data in a meaningful way.
+```lattice``` supports either Arista or Juniper devices (QFX, EX (Traditional or ELS), ACX and MX) and provision cross-connects as either VXLAN, L2VPN, VPLS or Q-in-Q depending on hardware capabilities.
 
-Instructions to follow, once I've decided how it's going to work ;)
+Cross-connects *should* also be supported across a homogenous network comprised of the above devices (where the cross-connect type is supported).
 
 ###Issues/Branching:
 
