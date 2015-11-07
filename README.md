@@ -1,9 +1,9 @@
 # lattice
-```lattice``` is an application for provisioning network based cross-connects in a Data Centre environment.
+```lattice``` is an application for provisioning network-based cross-connects in a Data Centre environment.
 
+```lattice``` supports either Arista or Juniper devices (QFX, EX (Traditional or ELS), ACX and MX) and provision cross-connects as either VXLAN, L2VPN, VPLS or Q-in-Q depending on hardware capabilities.
 
-
-Instructions to follow, once I've decided how it's going to work ;)
+Cross-connects *should* also be supported across a homogenous network comprised of the above devices (where the cross-connect type is supported).
 
 ###Issues/Branching:
 
